@@ -19,7 +19,7 @@ trait Html {
 
 impl Html for String {
     fn html(self) -> String {
-        STYLE.to_string() + "<button>hoge</button>"
+        STYLE.to_string() + &self
     }
 }
 

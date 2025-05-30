@@ -1,2 +1,6 @@
 [tasks.serve]
-run = "cargo run"
+run = """
+  watchexec --restart --clear --wrap-process=session --stop-signal \
+  SIGTERM --exts rs --watch src/ -- "cargo run"
+"""
+description = "run the CLI"
