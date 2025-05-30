@@ -1,7 +1,5 @@
-use actix_web::{
-    App, HttpResponse, HttpServer, Responder, http::header::ContentType, middleware, web,
-};
-use my_rust_app::router::web::hello;
+use actix_web::{App, HttpResponse, HttpServer, http::header::ContentType, middleware, web};
+use my_rust_app::router::web::home;
 
 const STYLE: &str = r"
 <style>
@@ -11,17 +9,13 @@ const STYLE: &str = r"
 </style>
 ";
 
-async fn render() -> impl Responder {
-    HttpResponse::Ok().body(hello().html())
-}
-
 trait Html {
-    fn html(self) -> String;
+    fn html(self) -> HttpResponse;
 }
 
 impl Html for String {
-    fn html(self) -> String {
-        STYLE.to_string() + &self
+    fn html(self) -> HttpResponse {
+        HttpResponse::Ok().body(STYLE.to_string() + &self)
     }
 }
 
@@ -34,7 +28,14 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .wrap(middleware::DefaultHeaders::new().add(ContentType::html()))
-            .route("/", web::get().to(render))
+            .route(
+                "/",
+                web::get().to(async || -> HttpResponse { String::from("hello").html() }),
+            )
+            .route(
+                "/books",
+                web::get().to(async || -> HttpResponse { home().html() }),
+            )
     })
     .bind((url, port))?
     .run()

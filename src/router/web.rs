@@ -1,10 +1,16 @@
-pub fn hello() -> String {
+pub use super::books;
+
+pub fn home() -> String {
     r"
     <div>
-        <div class=grid >
-            <a href=books >books</a>
-            <a href=books/create >books create</a>
-        </div>
+        <ul>
+            <li>
+                <a href=books >books</a>
+            </li>
+            <li>
+                <a href=books/create >books create</a>
+            </li>
+        </ul>
     </div>
     "
     .to_string()
