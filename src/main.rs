@@ -6,6 +6,8 @@ use my_rust_app::router::web::hello;
 const STYLE: &str = r"
 <style>
     ul,li, form {margin:0;}
+    .flex { display: flex; }
+    .grid { display: grid; }
 </style>
 ";
 
