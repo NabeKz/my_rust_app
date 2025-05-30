@@ -1,17 +1,26 @@
-use actix_web::{App, HttpResponse, HttpServer, Responder, get, post, web};
+use actix_web::{
+    App, HttpResponse, HttpServer, Responder, http::header::ContentType, middleware, web,
+};
+use my_rust_app::router::web::hello;
 
-#[get("/")]
-async fn hello() -> impl Responder {
-    HttpResponse::Ok().body("Hello world!")
+const STYLE: &str = r"
+<style>
+    ul,li, form {margin:0;}
+</style>
+";
+
+async fn render() -> impl Responder {
+    HttpResponse::Ok().body(hello().html())
 }
 
-#[post("/echo")]
-async fn echo(req_body: String) -> impl Responder {
-    HttpResponse::Ok().body(req_body)
+trait Html {
+    fn html(self) -> String;
 }
 
-async fn manual_hello() -> impl Responder {
-    HttpResponse::Ok().body("Hey there!")
+impl Html for String {
+    fn html(self) -> String {
+        STYLE.to_string() + "<button>hoge</button>"
+    }
 }
 
 #[actix_web::main]
@@ -22,9 +31,8 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(|| {
         App::new()
-            .service(hello)
-            .service(echo)
-            .route("/hey", web::get().to(manual_hello))
+            .wrap(middleware::DefaultHeaders::new().add(ContentType::html()))
+            .route("/", web::get().to(render))
     })
     .bind((url, port))?
     .run()
