@@ -7,11 +7,15 @@ impl Book {
     pub fn new<S: Into<String>>(name: S) -> Self {
         Self { name: name.into() }
     }
+
+    pub fn from_values(name: String) -> Self {
+        Self { name }
+    }
 }
 
-pub trait BookRepository {
+pub trait BookRepository: 'static {
     fn list(&self) -> Vec<Book>;
-    fn save(&mut self, book: Book) -> ();
+    fn save(&self, book: Book) -> ();
 }
 pub struct BookRepositoryOnMemory {
     items: Vec<Book>,
@@ -27,7 +31,8 @@ impl BookRepository for BookRepositoryOnMemory {
     fn list(&self) -> Vec<Book> {
         self.items.clone()
     }
-    fn save(&mut self, item: Book) -> () {
-        self.items.push(item);
+    fn save(&self, item: Book) -> () {
+        // self.items.push(item);
+        ()
     }
 }

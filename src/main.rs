@@ -75,7 +75,7 @@ async fn main() -> std::io::Result<()> {
                             Ok(()) => HttpResponse::SeeOther()
                                 .append_header((header::LOCATION, "/books"))
                                 .finish(),
-                            Err(err) => err.html(),
+                            Err(err) => err.join("<br />").html(),
                         }
                     },
                 ),
