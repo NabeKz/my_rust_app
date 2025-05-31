@@ -1,34 +1,6 @@
 use std::sync::Arc;
 
-#[derive(Clone)]
-pub struct Book {
-    name: String,
-}
-
-impl Book {
-    pub fn new<S: Into<String>>(name: S) -> Self {
-        Self { name: name.into() }
-    }
-}
-
-pub trait BookRepository {
-    fn list(&self) -> Vec<Book>;
-}
-pub struct BookRepositoryOnMemory {
-    items: Vec<Book>,
-}
-
-impl BookRepositoryOnMemory {
-    pub fn new() -> Self {
-        let items = vec![Book::new("hoge"), Book::new("fuga")];
-        Self { items }
-    }
-}
-impl BookRepository for BookRepositoryOnMemory {
-    fn list(&self) -> Vec<Book> {
-        self.items.clone()
-    }
-}
+use super::model::{Book, BookRepository};
 
 #[derive(Clone)]
 pub struct BookListController {

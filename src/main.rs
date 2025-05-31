@@ -8,13 +8,16 @@ use actix_web::{
 };
 
 use my_rust_app::web_router::{
-    book::{self, list::BookRepositoryOnMemory},
+    book::{
+        self, create::BookCreateController, list::BookListController, model::BookRepositoryOnMemory,
+    },
     home,
 };
 
 const STYLE: &str = r"
 <style>
     ul,li, form {margin:0;}
+    label { display: grid; width: fit-content; }
     .flex { display: flex; }
     .grid { display: grid; }
 </style>
@@ -22,6 +25,7 @@ const STYLE: &str = r"
 
 struct Context {
     book: book::list::BookListController,
+    book_create: book::create::BookCreateController,
 }
 trait Html {
     fn html(self) -> HttpResponse;
@@ -40,9 +44,11 @@ async fn main() -> std::io::Result<()> {
     println!("running on http://{}:{}", url, port);
 
     HttpServer::new(|| {
+        let book_repository = Arc::new(BookRepositoryOnMemory::new());
         App::new()
             .app_data(Data::new(Context {
-                book: book::list::BookListController::new(Arc::new(BookRepositoryOnMemory::new())),
+                book: BookListController::new(book_repository.clone()),
+                book_create: BookCreateController::new(book_repository.clone()),
             }))
             .wrap(middleware::DefaultHeaders::new().add(ContentType::html()))
             .route(
@@ -52,6 +58,10 @@ async fn main() -> std::io::Result<()> {
             .route(
                 "/books",
                 web::get().to(async |data: Data<Context>| book::list::index(&data.book).html()),
+            )
+            .route(
+                "/books/create",
+                web::get().to(async |_data: Data<Context>| book::create::index().html()),
             )
     })
     .bind((url, port))?
