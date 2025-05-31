@@ -1,1 +1,3 @@
-pub mod router;
+mod router;
+
+pub use router::web_router;

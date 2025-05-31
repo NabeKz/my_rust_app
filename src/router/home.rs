@@ -1,6 +1,4 @@
-pub use super::books;
-
-pub fn home() -> String {
+pub fn index() -> String {
     r"
     <div>
         <ul>

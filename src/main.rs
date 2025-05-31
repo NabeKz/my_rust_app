@@ -1,5 +1,6 @@
 use actix_web::{App, HttpResponse, HttpServer, http::header::ContentType, middleware, web};
-use my_rust_app::router::web::home;
+
+use my_rust_app::web_router::{book, home};
 
 const STYLE: &str = r"
 <style>
@@ -30,11 +31,11 @@ async fn main() -> std::io::Result<()> {
             .wrap(middleware::DefaultHeaders::new().add(ContentType::html()))
             .route(
                 "/",
-                web::get().to(async || -> HttpResponse { String::from("hello").html() }),
+                web::get().to(async || -> HttpResponse { home::index().html() }),
             )
             .route(
                 "/books",
-                web::get().to(async || -> HttpResponse { home().html() }),
+                web::get().to(async || -> HttpResponse { book::list::index().html() }),
             )
     })
     .bind((url, port))?
