@@ -10,6 +10,9 @@ const STYLE: &str = r"
 </style>
 ";
 
+struct Context {
+    book: book::list::BookListController,
+}
 trait Html {
     fn html(self) -> HttpResponse;
 }
@@ -28,6 +31,9 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(|| {
         App::new()
+            .app_data(web::Data::new(Context {
+                book: book::list::BookListController::new(),
+            }))
             .wrap(middleware::DefaultHeaders::new().add(ContentType::html()))
             .route(
                 "/",
@@ -35,7 +41,9 @@ async fn main() -> std::io::Result<()> {
             )
             .route(
                 "/books",
-                web::get().to(async || -> HttpResponse { book::list::index().html() }),
+                web::get().to(async |data: web::Data<Context>| -> HttpResponse {
+                    book::list::index(&data.book).html()
+                }),
             )
     })
     .bind((url, port))?
