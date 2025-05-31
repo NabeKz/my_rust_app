@@ -1,15 +1,18 @@
 use std::sync::Arc;
 
 use actix_web::{
-    App, HttpResponse, HttpServer,
-    http::header::ContentType,
+    App, HttpRequest, HttpResponse, HttpServer,
+    http::header::{self, ContentType},
     middleware,
-    web::{self, Data},
+    web::{self, Data, Form, redirect},
 };
 
 use my_rust_app::web_router::{
     book::{
-        self, create::BookCreateController, list::BookListController, model::BookRepositoryOnMemory,
+        self,
+        create::{BookCreateController, FormData},
+        list::BookListController,
+        model::BookRepositoryOnMemory,
     },
     home,
 };
@@ -62,6 +65,21 @@ async fn main() -> std::io::Result<()> {
             .route(
                 "/books/create",
                 web::get().to(async |_data: Data<Context>| book::create::index().html()),
+            )
+            .route(
+                "/books/create",
+                web::post().to(
+                    async |data: Data<Context>, form: Form<book::create::FormData>| {
+                        let result = book::create::create(&data.book_create, &form);
+                        match result {
+                            Ok(()) => HttpResponse::TemporaryRedirect()
+                                .append_header((header::LOCATION, "http://localhost:5000/books"))
+                                .finish(),
+
+                            Err(err) => err.html(),
+                        }
+                    },
+                ),
             )
     })
     .bind((url, port))?
