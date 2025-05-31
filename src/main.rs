@@ -4,7 +4,7 @@ use actix_web::{
     App, HttpRequest, HttpResponse, HttpServer,
     http::header::{self, ContentType},
     middleware,
-    web::{self, Data, Form, redirect},
+    web::{self, Data, Form, Redirect, redirect},
 };
 
 use my_rust_app::web_router::{
@@ -72,10 +72,9 @@ async fn main() -> std::io::Result<()> {
                     async |data: Data<Context>, form: Form<book::create::FormData>| {
                         let result = book::create::create(&data.book_create, &form);
                         match result {
-                            Ok(()) => HttpResponse::TemporaryRedirect()
-                                .append_header((header::LOCATION, "http://localhost:5000/books"))
+                            Ok(()) => HttpResponse::SeeOther()
+                                .append_header((header::LOCATION, "/books"))
                                 .finish(),
-
                             Err(err) => err.html(),
                         }
                     },
