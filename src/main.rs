@@ -1,6 +1,16 @@
-use actix_web::{App, HttpResponse, HttpServer, http::header::ContentType, middleware, web};
+use std::sync::Arc;
 
-use my_rust_app::web_router::{book, home};
+use actix_web::{
+    App, HttpResponse, HttpServer,
+    http::header::ContentType,
+    middleware,
+    web::{self, Data},
+};
+
+use my_rust_app::web_router::{
+    book::{self, list::BookRepositoryOnMemory},
+    home,
+};
 
 const STYLE: &str = r"
 <style>
@@ -31,8 +41,8 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(|| {
         App::new()
-            .app_data(web::Data::new(Context {
-                book: book::list::BookListController::new(),
+            .app_data(Data::new(Context {
+                book: book::list::BookListController::new(Arc::new(BookRepositoryOnMemory::new())),
             }))
             .wrap(middleware::DefaultHeaders::new().add(ContentType::html()))
             .route(
@@ -41,9 +51,7 @@ async fn main() -> std::io::Result<()> {
             )
             .route(
                 "/books",
-                web::get().to(async |data: web::Data<Context>| -> HttpResponse {
-                    book::list::index(&data.book).html()
-                }),
+                web::get().to(async |data: Data<Context>| book::list::index(&data.book).html()),
             )
     })
     .bind((url, port))?

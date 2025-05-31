@@ -1,6 +1,7 @@
-use actix_web::HttpRequest;
+use std::sync::Arc;
 
-struct Book {
+#[derive(Clone)]
+pub struct Book {
     name: String,
 }
 
@@ -10,8 +11,8 @@ impl Book {
     }
 }
 
-trait BookRepository {
-    fn list(self) -> Vec<Book>;
+pub trait BookRepository {
+    fn list(&self) -> Vec<Book>;
 }
 pub struct BookRepositoryOnMemory {
     items: Vec<Book>,
@@ -24,26 +25,31 @@ impl BookRepositoryOnMemory {
     }
 }
 impl BookRepository for BookRepositoryOnMemory {
-    fn list(self) -> Vec<Book> {
-        self.items
+    fn list(&self) -> Vec<Book> {
+        self.items.clone()
     }
 }
 
 #[derive(Clone)]
-pub struct BookListController {}
+pub struct BookListController {
+    repository: Arc<dyn BookRepository>,
+}
 
 impl BookListController {
-    pub fn new() -> Self {
-        Self {}
+    pub fn new(repository: Arc<dyn BookRepository>) -> Self {
+        Self { repository }
+    }
+    pub fn query(&self) -> Vec<Book> {
+        self.repository.list()
     }
 }
 
 pub fn index(controller: &BookListController) -> String {
-    format!(
-        "
-        <ul>
-            <li>book</li>
-        </ul>
-        "
-    )
+    let items = controller
+        .query()
+        .iter()
+        .map(|it| format!("<li>{}</li>", it.name))
+        .collect::<String>();
+
+    format!("<ul>{}</ul>", items)
 }
