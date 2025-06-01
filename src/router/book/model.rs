@@ -33,9 +33,10 @@ impl BookRepositoryOnMemory {
 }
 impl BookRepository for BookRepositoryOnMemory {
     fn list(&self) -> Vec<Book> {
-        self.items.lock().unwrap().to_vec()
+        self.items.lock().unwrap().clone()
     }
     fn save(&self, item: Book) -> () {
-        self.items.lock().unwrap().push(item);
+        let mut items = self.items.lock().unwrap();
+        items.push(item);
     }
 }
