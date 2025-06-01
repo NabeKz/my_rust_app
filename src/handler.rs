@@ -3,10 +3,8 @@ use std::sync::{Arc, Mutex};
 use actix_web::web;
 
 use crate::router::book::{
-    self,
-    create::BookCreateController,
-    list::BookListController,
-    model::{Book, BookRepository, BookRepositoryOnMemory},
+    create::BookCreateController, delete::BookDeleteController, list::BookListController,
+    model::BookRepositoryOnMemory,
 };
 
 pub fn config(conf: &mut web::ServiceConfig) {
@@ -24,6 +22,7 @@ pub fn config(conf: &mut web::ServiceConfig) {
 pub struct Context {
     pub book: Arc<BookListController>,
     pub book_create: Arc<BookCreateController>,
+    pub book_delete: Arc<BookDeleteController>,
 }
 
 impl Context {
@@ -32,6 +31,7 @@ impl Context {
         Self {
             book: Arc::new(BookListController::new(repository.clone())),
             book_create: Arc::new(BookCreateController::new(repository.clone())),
+            book_delete: Arc::new(BookDeleteController::new(repository.clone())),
         }
     }
 }

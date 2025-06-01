@@ -4,7 +4,7 @@ use actix_web::{
     App, HttpResponse, HttpServer,
     http::header::{self, ContentType},
     middleware,
-    web::{self, Data, Form},
+    web::{self, Data, Form, Path},
 };
 
 use my_rust_app::{
@@ -61,6 +61,21 @@ async fn main() -> std::io::Result<()> {
             .route(
                 "/books/create",
                 web::get().to(async |_data: Data<Context>| book::create::index().html()),
+            )
+            .route(
+                "/books/delete/{id}",
+                web::delete().to(async |data: Data<Context>, path: Path<String>| {
+                    let id = path.into_inner();
+                    let result = book::delete::delete(&data.book_delete, id);
+                    match result {
+                        Ok(()) => HttpResponse::SeeOther()
+                            .append_header((header::LOCATION, "/books"))
+                            .finish(),
+                        Err(_) => HttpResponse::SeeOther()
+                            .append_header((header::LOCATION, "/books"))
+                            .finish(),
+                    }
+                }),
             )
             .route(
                 "/books/create",
