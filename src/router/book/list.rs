@@ -23,5 +23,5 @@ pub fn index(controller: &BookListController) -> String {
         .map(|it| format!("<li>{}</li>", it.name))
         .collect::<String>();
 
-    format!("<ul>{}</ul>", items)
+    format!("<ul>{}</ul>", items) + "<a href=/>back</a>"
 }

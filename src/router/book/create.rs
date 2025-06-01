@@ -6,10 +6,6 @@ use super::model::{Book, BookRepository};
 use crate::router::html::{input, post_form};
 use Result::{Err, Ok};
 
-pub struct BookCreateController {
-    repository: Arc<dyn BookRepository>,
-}
-
 trait Validator<T> {
     fn required(&self) -> Result<(), String>;
 }
@@ -40,12 +36,12 @@ impl FormData {
         }
     }
 }
+pub struct BookCreateController {
+    repository: Arc<dyn BookRepository>,
+}
 impl BookCreateController {
     pub fn new(repository: Arc<dyn BookRepository>) -> Self {
         Self { repository }
-    }
-    pub fn query(&self) -> Vec<Book> {
-        self.repository.list()
     }
 }
 

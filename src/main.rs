@@ -1,18 +1,15 @@
 use std::sync::Arc;
 
 use actix_web::{
-    App, HttpRequest, HttpResponse, HttpServer,
+    App, HttpResponse, HttpServer,
     http::header::{self, ContentType},
     middleware,
-    web::{self, Data, Form, Redirect, redirect},
+    web::{self, Data, Form},
 };
 
 use my_rust_app::web_router::{
     book::{
-        self,
-        create::{BookCreateController, FormData},
-        list::BookListController,
-        model::BookRepositoryOnMemory,
+        self, create::BookCreateController, list::BookListController, model::BookRepositoryOnMemory,
     },
     home,
 };
@@ -48,6 +45,7 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(|| {
         let book_repository = Arc::new(BookRepositoryOnMemory::new());
+
         App::new()
             .app_data(Data::new(Context {
                 book: BookListController::new(book_repository.clone()),
