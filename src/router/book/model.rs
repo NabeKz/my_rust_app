@@ -36,7 +36,6 @@ impl BookRepository for BookRepositoryOnMemory {
         self.items.lock().unwrap().clone()
     }
     fn save(&self, item: Book) -> () {
-        let mut items = self.items.lock().unwrap();
-        items.push(item);
+        let _ = self.items.lock().unwrap().push(item);
     }
 }
