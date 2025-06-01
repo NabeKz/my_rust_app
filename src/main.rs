@@ -1,17 +1,19 @@
-use std::sync::{Arc, Mutex};
+use std::{io::Split, vec};
 
 use actix_web::{
-    App, HttpResponse, HttpServer,
-    http::header::{self, ContentType},
+    App, HttpRequest, HttpResponse, HttpServer,
+    dev::{Service, ServiceRequest},
+    http::{
+        Method,
+        header::{self, ContentType},
+    },
     middleware,
     web::{self, Data, Form, Path},
 };
 
 use my_rust_app::{
     handler::Context,
-    web_router::book::{
-        self, create::BookCreateController, list::BookListController, model::BookRepositoryOnMemory,
-    },
+    web_router::book::{self},
 };
 
 const STYLE: &str = r"
@@ -52,6 +54,14 @@ pub fn home() -> String {
     .to_string()
 }
 
+fn method_override(method: &Method, query: String) -> Method {
+    let vec: Vec<&str> = query.split("_method=").collect();
+    match (method, vec.as_slice()) {
+        (&Method::POST, ["DELETE"]) => Method::DELETE,
+        _ => method.clone(),
+    }
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let url = "localhost";
@@ -65,6 +75,12 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(app_data.clone())
             .wrap(middleware::DefaultHeaders::new().add(ContentType::html()))
+            .wrap_fn(|mut req, srv| {
+                let method = req.method().clone();
+                let query = req.query_string().to_string();
+                req.head_mut().method = method_override(&method, query);
+                srv.call(req)
+            })
             .route(
                 "/",
                 web::get().to(async || -> HttpResponse { home().html() }),
