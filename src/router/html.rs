@@ -1,14 +1,12 @@
-pub fn li(content: String) -> String {
-    format!("<li>{}</li>", content)
-}
-
 enum Method {
     POST,
+    DELETE,
 }
 
 fn form(method: Method, action: &str, content: String) -> String {
     let req_method = match method {
         Method::POST => "POST",
+        Method::DELETE => "DELETE",
     };
 
     format!(
@@ -25,6 +23,9 @@ fn form(method: Method, action: &str, content: String) -> String {
 }
 pub fn post_form(action: &str, content: String) -> String {
     form(Method::POST, action, content)
+}
+pub fn delete_form(action: &str, content: String) -> String {
+    form(Method::DELETE, action, content)
 }
 
 pub fn input(id: &str) -> String {

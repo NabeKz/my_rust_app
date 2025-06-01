@@ -1,4 +1,8 @@
-use std::sync::Arc;
+use std::{fmt::format, sync::Arc};
+
+use uuid::Uuid;
+
+use crate::router::html::{self, delete_form, post_form};
 
 use super::model::{Book, BookRepository};
 
@@ -17,11 +21,14 @@ impl BookListController {
 }
 
 pub fn index(controller: &BookListController) -> String {
+    let form = |id: Uuid| -> String {
+        let action = format!("/books/delete/{}", id.to_string());
+        post_form(&action, "".to_string())
+    };
     let items = controller
         .query()
         .iter()
-        .map(|it| format!("<li>{}</li>", it.name))
+        .map(|it| format!("<li>{}{}</li>", it.name, form(it.id)))
         .collect::<String>();
-
     format!("<ul>{}</ul>", items) + "<a href=/>back</a>"
 }

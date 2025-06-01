@@ -9,12 +9,8 @@ use actix_web::{
 
 use my_rust_app::{
     handler::Context,
-    web_router::{
-        book::{
-            self, create::BookCreateController, list::BookListController,
-            model::BookRepositoryOnMemory,
-        },
-        home,
+    web_router::book::{
+        self, create::BookCreateController, list::BookListController, model::BookRepositoryOnMemory,
     },
 };
 
@@ -37,6 +33,25 @@ impl Html for String {
     }
 }
 
+pub fn home() -> String {
+    r"
+    <div>
+        <ul>
+            <li>
+                <a href=books >books</a>
+            </li>
+            <li>
+                <a href=books/create >books create</a>
+            </li>
+            <li>
+                <a href=books/delete >books delete</a>
+            </li>
+        </ul>
+    </div>
+    "
+    .to_string()
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let url = "localhost";
@@ -52,7 +67,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(middleware::DefaultHeaders::new().add(ContentType::html()))
             .route(
                 "/",
-                web::get().to(async || -> HttpResponse { home::index().html() }),
+                web::get().to(async || -> HttpResponse { home().html() }),
             )
             .route(
                 "/books",
@@ -64,7 +79,7 @@ async fn main() -> std::io::Result<()> {
             )
             .route(
                 "/books/delete/{id}",
-                web::delete().to(async |data: Data<Context>, path: Path<String>| {
+                web::post().to(async |data: Data<Context>, path: Path<String>| {
                     let id = path.into_inner();
                     let result = book::delete::delete(&data.book_delete, id);
                     match result {
