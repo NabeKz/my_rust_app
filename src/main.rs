@@ -7,11 +7,15 @@ use actix_web::{
     web::{self, Data, Form},
 };
 
-use my_rust_app::web_router::{
-    book::{
-        self, create::BookCreateController, list::BookListController, model::BookRepositoryOnMemory,
+use my_rust_app::{
+    handler::Context,
+    web_router::{
+        book::{
+            self, create::BookCreateController, list::BookListController,
+            model::BookRepositoryOnMemory,
+        },
+        home,
     },
-    home,
 };
 
 const STYLE: &str = r"
@@ -23,10 +27,6 @@ const STYLE: &str = r"
 </style>
 ";
 
-struct Context {
-    book: book::list::BookListController,
-    book_create: book::create::BookCreateController,
-}
 trait Html {
     fn html(self) -> HttpResponse;
 }
@@ -43,14 +43,12 @@ async fn main() -> std::io::Result<()> {
     let port = 5000;
     println!("running on http://{}:{}", url, port);
 
-    HttpServer::new(|| {
-        let book_repository = Arc::new(BookRepositoryOnMemory::new());
+    let app_state = Context::init();
+    let app_data = Data::new(app_state);
 
+    HttpServer::new(move || {
         App::new()
-            .app_data(Data::new(Context {
-                book: BookListController::new(book_repository.clone()),
-                book_create: BookCreateController::new(book_repository.clone()),
-            }))
+            .app_data(app_data.clone())
             .wrap(middleware::DefaultHeaders::new().add(ContentType::html()))
             .route(
                 "/",

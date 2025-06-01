@@ -1,4 +1,4 @@
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 
 #[derive(Clone)]
 pub struct Book {
@@ -15,19 +15,19 @@ impl Book {
     }
 }
 
-pub trait BookRepository: 'static {
+pub trait BookRepository: Sync + Send + 'static {
     fn list(&self) -> Vec<Book>;
     fn save(&self, book: Book) -> ();
 }
 pub struct BookRepositoryOnMemory {
-    items: Mutex<Vec<Book>>,
+    items: Arc<Mutex<Vec<Book>>>,
 }
 
 impl BookRepositoryOnMemory {
     pub fn new() -> Self {
         let items = vec![Book::new("hoge"), Book::new("fuga")];
         Self {
-            items: Mutex::new(items),
+            items: Arc::new(Mutex::new(items)),
         }
     }
 }
