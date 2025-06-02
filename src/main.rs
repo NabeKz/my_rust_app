@@ -102,7 +102,7 @@ async fn main() -> std::io::Result<()> {
                 "/books/update/{id}",
                 web::put().to(async |data: Data<Context>, path: Path<String>| {
                     let id = path.into_inner();
-                    let result = book::delete::delete(&data.book_delete, id);
+                    let result = book::update::update(&data.book_update, id);
                     match result {
                         Ok(()) => HttpResponse::SeeOther()
                             .append_header((header::LOCATION, "/books"))

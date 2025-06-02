@@ -28,7 +28,7 @@ pub trait BookRepository: Sync + Send + 'static {
     fn list(&self) -> Vec<Book>;
     fn save(&self, book: Book) -> ();
     fn find(&self, id: Uuid) -> Result<Book, String>;
-    fn update(&self, book: Book) -> ();
+    fn update(&self, book: Book) -> Result<(), String>;
     fn delete(&self, id: Uuid) -> ();
 }
 pub struct BookRepositoryOnMemory {
@@ -65,7 +65,13 @@ impl BookRepository for BookRepositoryOnMemory {
         }
     }
 
-    fn update(&self, book: Book) -> () {
-        todo!()
+    fn update(&self, book: Book) -> Result<(), String> {
+        let mut items = self.items.lock().unwrap();
+        if let Some(pos) = items.iter().position(|it| it.id == book.id) {
+            items[pos] = book;
+            Ok(())
+        } else {
+            Err("not found".to_string())
+        }
     }
 }
