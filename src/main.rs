@@ -1,8 +1,6 @@
-use std::{io::Split, vec};
-
 use actix_web::{
-    App, HttpRequest, HttpResponse, HttpServer,
-    dev::{Service, ServiceRequest},
+    App, HttpResponse, HttpServer,
+    dev::Service,
     http::{
         Method,
         header::{self, ContentType},
@@ -92,6 +90,21 @@ async fn main() -> std::io::Result<()> {
             .route(
                 "/books/create",
                 web::get().to(async |_data: Data<Context>| book::create::index().html()),
+            )
+            .route(
+                "/books/update/{id}",
+                web::post().to(async |data: Data<Context>, path: Path<String>| {
+                    let id = path.into_inner();
+                    let result = book::delete::delete(&data.book_delete, id);
+                    match result {
+                        Ok(()) => HttpResponse::SeeOther()
+                            .append_header((header::LOCATION, "/books"))
+                            .finish(),
+                        Err(_) => HttpResponse::SeeOther()
+                            .append_header((header::LOCATION, "/books"))
+                            .finish(),
+                    }
+                }),
             )
             .route(
                 "/books/delete/{id}",

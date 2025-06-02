@@ -27,6 +27,8 @@ impl Book {
 pub trait BookRepository: Sync + Send + 'static {
     fn list(&self) -> Vec<Book>;
     fn save(&self, book: Book) -> ();
+    fn find(&self, id: Uuid) -> ();
+    fn update(&self, book: Book) -> ();
     fn delete(&self, id: Uuid) -> ();
 }
 pub struct BookRepositoryOnMemory {
@@ -52,5 +54,13 @@ impl BookRepository for BookRepositoryOnMemory {
         let mut items = self.items.lock().unwrap();
         // TODO: handle not found
         items.retain(|it| it.id != id);
+    }
+
+    fn find(&self, id: Uuid) -> () {
+        todo!()
+    }
+
+    fn update(&self, book: Book) -> () {
+        todo!()
     }
 }
