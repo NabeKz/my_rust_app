@@ -55,7 +55,7 @@ pub fn home() -> String {
 fn method_override(method: &Method, query: String) -> Method {
     let vec: Vec<&str> = query.split("_method=").collect();
     match (method, vec.as_slice()) {
-        (&Method::POST, ["DELETE"]) => Method::DELETE,
+        (&Method::POST, ["", "DELETE"]) => Method::DELETE,
         _ => method.clone(),
     }
 }
