@@ -24,15 +24,48 @@ fn link(id: Uuid) -> String {
     format!("<a href=/books/update/{}>{}</a>", id, "link")
 }
 
+fn form(id: Uuid) -> String {
+    let action = format!("/books/delete/{}?_method=DELETE", id.to_string());
+    post_form(&action, "".to_string())
+}
+
+fn td(book: &Book) -> String {
+    format!(
+        "
+        <td>{}</td>
+        <td>{}</td>
+        <td>{}</td>
+        <td>{}</td>
+        ",
+        book.id,
+        book.name,
+        link(book.id),
+        form(book.id)
+    )
+}
+
 pub fn index(controller: &BookListController) -> String {
-    let form = |id: Uuid| -> String {
-        let action = format!("/books/delete/{}?_method=DELETE", id.to_string());
-        post_form(&action, "".to_string())
-    };
     let items = controller
         .query()
         .iter()
-        .map(|it| format!("<li>{}{}{}</li>", it.name, link(it.id), form(it.id)))
+        .map(|it| format!("<tr>{}</tr>", td(&it)))
         .collect::<String>();
-    format!("<ul>{}</ul>", items) + "<a href=/>back</a>"
+    format!(
+        "
+    <table>
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>name</th>
+                <th>edit</th>
+                <th>delete</th>
+            </tr>
+        </thead>
+        <tbody>
+        {}
+        </tbody>
+    </table>
+    ",
+        items
+    )
 }

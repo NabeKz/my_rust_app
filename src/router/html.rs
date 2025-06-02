@@ -13,7 +13,7 @@ fn form(method: Method, action: &str, content: String) -> String {
         "
         <form action={} method={}>
             {}
-            <div style=padding-top:8px;>
+            <div>
                 <button type=submit> submit </button>
             </div>
         </form>

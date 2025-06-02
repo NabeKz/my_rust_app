@@ -7,7 +7,7 @@ use crate::router::html::{input, post_form};
 use Result::{Err, Ok};
 
 trait Validator<T> {
-    fn required(&self) -> Result<(), String>;
+    fn required(&self) -> Result<(), T>;
 }
 
 impl Validator<String> for String {

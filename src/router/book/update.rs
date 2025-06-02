@@ -2,8 +2,6 @@ use std::{str::FromStr, sync::Arc};
 
 use uuid::Uuid;
 
-use crate::router::html::post_form;
-
 use super::model::{Book, BookRepository};
 
 #[derive(Clone)]

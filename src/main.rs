@@ -16,7 +16,7 @@ use my_rust_app::{
 
 const STYLE: &str = r"
 <style>
-    ul,li, form {margin:0;}
+    ul,li, form { margin:0; }
     label { display: grid; width: fit-content; }
     .flex { display: flex; }
     .grid { display: grid; }
@@ -95,7 +95,7 @@ async fn main() -> std::io::Result<()> {
                 "/books/update/{id}",
                 web::get().to(async |data: Data<Context>, path: Path<String>| {
                     let id = path.into_inner();
-                    book::update::find(&data.book_update, id)
+                    book::update::find(&data.book_update, id).html()
                 }),
             )
             .route(
@@ -115,7 +115,7 @@ async fn main() -> std::io::Result<()> {
             )
             .route(
                 "/books/delete/{id}",
-                web::post().to(async |data: Data<Context>, path: Path<String>| {
+                web::delete().to(async |data: Data<Context>, path: Path<String>| {
                     let id = path.into_inner();
                     let result = book::delete::delete(&data.book_delete, id);
                     match result {
