@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{str::FromStr, sync::Arc};
 
 use uuid::Uuid;
 
@@ -15,20 +15,17 @@ impl BookGetController {
     pub fn new(repository: Arc<dyn BookRepository>) -> Self {
         Self { repository }
     }
-    pub fn invoke(&self) -> Vec<Book> {
-        self.repository.list()
+    pub fn invoke(&self, id: Uuid) -> Result<Book, String> {
+        self.repository.find(id)
     }
 }
 
-pub fn index(controller: &BookGetController) -> String {
-    let form = |id: Uuid| -> String {
-        let action = format!("/books/delete/{}?_method=DELETE", id.to_string());
-        post_form(&action, "".to_string())
+pub fn find(controller: &BookGetController, id: String) -> String {
+    let uuid = Uuid::from_str(&id).unwrap();
+    let item = controller.invoke(uuid);
+    let result = match item {
+        Result::Ok(_) => "ok",
+        Result::Err(_) => "ng",
     };
-    let items = controller
-        .invoke()
-        .iter()
-        .map(|it| format!("<li>{}{}</li>", it.name, form(it.id)))
-        .collect::<String>();
-    format!("<ul>{}</ul>", items) + "<a href=/>back</a>"
+    result.to_string()
 }

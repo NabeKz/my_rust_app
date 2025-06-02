@@ -93,7 +93,14 @@ async fn main() -> std::io::Result<()> {
             )
             .route(
                 "/books/update/{id}",
-                web::post().to(async |data: Data<Context>, path: Path<String>| {
+                web::get().to(async |data: Data<Context>, path: Path<String>| {
+                    let id = path.into_inner();
+                    book::update::find(&data.book_update, id)
+                }),
+            )
+            .route(
+                "/books/update/{id}",
+                web::put().to(async |data: Data<Context>, path: Path<String>| {
                     let id = path.into_inner();
                     let result = book::delete::delete(&data.book_delete, id);
                     match result {

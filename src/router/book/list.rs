@@ -20,6 +20,10 @@ impl BookListController {
     }
 }
 
+fn link(id: Uuid) -> String {
+    format!("<a href=/books/update/{}>{}</a>", id, "link")
+}
+
 pub fn index(controller: &BookListController) -> String {
     let form = |id: Uuid| -> String {
         let action = format!("/books/delete/{}?_method=DELETE", id.to_string());
@@ -28,7 +32,7 @@ pub fn index(controller: &BookListController) -> String {
     let items = controller
         .query()
         .iter()
-        .map(|it| format!("<li>{}{}</li>", it.name, form(it.id)))
+        .map(|it| format!("<li>{}{}{}</li>", it.name, link(it.id), form(it.id)))
         .collect::<String>();
     format!("<ul>{}</ul>", items) + "<a href=/>back</a>"
 }

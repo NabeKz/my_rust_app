@@ -4,7 +4,7 @@ use actix_web::web;
 
 use crate::router::book::{
     create::BookCreateController, delete::BookDeleteController, list::BookListController,
-    model::BookRepositoryOnMemory,
+    model::BookRepositoryOnMemory, update::BookGetController,
 };
 
 pub fn config(conf: &mut web::ServiceConfig) {
@@ -22,6 +22,7 @@ pub fn config(conf: &mut web::ServiceConfig) {
 pub struct Context {
     pub book: Arc<BookListController>,
     pub book_create: Arc<BookCreateController>,
+    pub book_update: Arc<BookGetController>,
     pub book_delete: Arc<BookDeleteController>,
 }
 
@@ -31,6 +32,7 @@ impl Context {
         Self {
             book: Arc::new(BookListController::new(repository.clone())),
             book_create: Arc::new(BookCreateController::new(repository.clone())),
+            book_update: Arc::new(BookGetController::new(repository.clone())),
             book_delete: Arc::new(BookDeleteController::new(repository.clone())),
         }
     }
