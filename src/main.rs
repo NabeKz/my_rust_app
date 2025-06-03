@@ -101,18 +101,7 @@ async fn main() -> std::io::Result<()> {
             )
             .route(
                 "/books/delete/{id}",
-                web::delete().to(async |data: Data<Context>, path: Path<String>| {
-                    let id = path.into_inner();
-                    let result = book::delete::delete(&data.book_delete, id);
-                    match result {
-                        Ok(()) => HttpResponse::SeeOther()
-                            .append_header((header::LOCATION, "/books"))
-                            .finish(),
-                        Err(_) => HttpResponse::SeeOther()
-                            .append_header((header::LOCATION, "/books"))
-                            .finish(),
-                    }
-                }),
+                web::delete().to(presentation::book::pages::delete::command),
             )
             .route(
                 "/books/create",
