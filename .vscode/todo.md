@@ -6,3 +6,4 @@
 [ ] - refactor method_override
 [ ] - commonize create and update
 [ ] - scoped route
+[ ] - fix dependency flow

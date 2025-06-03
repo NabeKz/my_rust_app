@@ -19,3 +19,16 @@ impl Html for String {
         HttpResponse::Ok().body(STYLE.to_string() + &self)
     }
 }
+
+pub trait Validator<T> {
+    fn required(&self) -> Result<(), T>;
+}
+
+impl Validator<String> for String {
+    fn required(&self) -> Result<(), String> {
+        match self.is_empty() {
+            true => Err("required".to_string()),
+            false => Ok(()),
+        }
+    }
+}

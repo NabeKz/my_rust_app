@@ -12,30 +12,11 @@ use actix_web::{
 use my_rust_app::{
     handler::Context,
     presentation,
+    presentation::shared::Html,
     web_router::book::{self},
 };
 
-const STYLE: &str = r"
-<style>
-    ul,li, form { margin:0; }
-    label { display: grid; width: fit-content; }
-    label + div:has(button) { padding-top: 8px; }
-    .flex { display: flex; }
-    .grid { display: grid; }
-</style>
-";
-
-trait Html {
-    fn html(self) -> HttpResponse;
-}
-
-impl Html for String {
-    fn html(self) -> HttpResponse {
-        HttpResponse::Ok().body(STYLE.to_string() + &self)
-    }
-}
-
-pub fn home() -> String {
+pub async fn home() -> HttpResponse {
     r"
     <div>
         <ul>
@@ -52,6 +33,7 @@ pub fn home() -> String {
     </div>
     "
     .to_string()
+    .html()
 }
 
 fn method_override(method: &Method, query: String) -> Method {
@@ -82,14 +64,11 @@ async fn main() -> std::io::Result<()> {
                 req.head_mut().method = method_override(&method, query);
                 srv.call(req)
             })
-            .route(
-                "/",
-                web::get().to(async || -> HttpResponse { home().html() }),
-            )
+            .route("/", web::get().to(home))
             .route("/books", web::get().to(presentation::book::get_books))
             .route(
                 "/books/create",
-                web::get().to(async |_data: Data<Context>| book::create::index().html()),
+                web::get().to(presentation::book::pages::create::index),
             )
             .route(
                 "/books/update/{id}",
@@ -137,17 +116,7 @@ async fn main() -> std::io::Result<()> {
             )
             .route(
                 "/books/create",
-                web::post().to(
-                    async |data: Data<Context>, form: Form<book::create::FormData>| {
-                        let result = book::create::create(&data.book_create, &form);
-                        match result {
-                            Ok(()) => HttpResponse::SeeOther()
-                                .append_header((header::LOCATION, "/books"))
-                                .finish(),
-                            Err(err) => err.join("<br />").html(),
-                        }
-                    },
-                ),
+                web::post().to(presentation::book::pages::create::command),
             )
     })
     .bind((url, port))?

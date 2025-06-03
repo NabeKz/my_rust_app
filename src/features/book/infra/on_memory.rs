@@ -1,8 +1,7 @@
 use std::sync::{Arc, Mutex};
-
 use uuid::Uuid;
 
-use crate::domain::book::{Book, BookRepository};
+use crate::features::book::model::{Book, BookRepository};
 
 pub struct BookRepositoryOnMemory {
     items: Arc<Mutex<Vec<Book>>>,
