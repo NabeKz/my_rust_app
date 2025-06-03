@@ -46,7 +46,7 @@ impl BookCreateController {
 }
 
 pub fn index() -> String {
-    let content = input("name");
+    let content = input("name", "");
     post_form("/books/create", content).to_string()
 }
 

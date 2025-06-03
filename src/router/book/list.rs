@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use uuid::Uuid;
 
-use crate::router::html::post_form;
+use crate::router::html::delete_form;
 
 use super::model::{Book, BookRepository};
 
@@ -25,8 +25,8 @@ fn link(id: Uuid) -> String {
 }
 
 fn form(id: Uuid) -> String {
-    let action = format!("/books/delete/{}?_method=DELETE", id.to_string());
-    post_form(&action, "".to_string())
+    let action = format!("/books/delete/{}", id.to_string());
+    delete_form(&action, "".to_string())
 }
 
 fn td(book: &Book) -> String {

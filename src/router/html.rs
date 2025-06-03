@@ -33,13 +33,13 @@ pub fn delete_form(action: &str, content: String) -> String {
     form(Method::DELETE, action, content)
 }
 
-pub fn input(id: &str) -> String {
+pub fn input(id: &str, value: &str) -> String {
     format!(
         "<label for={}>
             {}
-            <input id={} name={} />
+            <input id={} name={} value='{}' />
         </label>
     ",
-        id, id, id, id
+        id, id, id, id, value
     )
 }

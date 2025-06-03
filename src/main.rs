@@ -18,6 +18,7 @@ const STYLE: &str = r"
 <style>
     ul,li, form { margin:0; }
     label { display: grid; width: fit-content; }
+    label + div:has(button) { padding-top: 8px; }
     .flex { display: flex; }
     .grid { display: grid; }
 </style>
@@ -56,6 +57,7 @@ fn method_override(method: &Method, query: String) -> Method {
     let vec: Vec<&str> = query.split("_method=").collect();
     match (method, vec.as_slice()) {
         (&Method::POST, ["", "DELETE"]) => Method::DELETE,
+        (&Method::POST, ["", "PUT"]) => Method::PUT,
         _ => method.clone(),
     }
 }
@@ -100,18 +102,22 @@ async fn main() -> std::io::Result<()> {
             )
             .route(
                 "/books/update/{id}",
-                web::put().to(async |data: Data<Context>, path: Path<String>| {
-                    let id = path.into_inner();
-                    let result = book::update::update(&data.book_update, id);
-                    match result {
-                        Ok(()) => HttpResponse::SeeOther()
-                            .append_header((header::LOCATION, "/books"))
-                            .finish(),
-                        Err(_) => HttpResponse::SeeOther()
-                            .append_header((header::LOCATION, "/books"))
-                            .finish(),
-                    }
-                }),
+                web::put().to(
+                    async |data: Data<Context>,
+                           path: Path<String>,
+                           form: Form<book::update::FormData>| {
+                        let id = path.into_inner();
+                        let result = book::update::update(&data.book_update, id, &form);
+                        match result {
+                            Ok(()) => HttpResponse::SeeOther()
+                                .append_header((header::LOCATION, "/books"))
+                                .finish(),
+                            Err(_) => HttpResponse::SeeOther()
+                                .append_header((header::LOCATION, "/books"))
+                                .finish(),
+                        }
+                    },
+                ),
             )
             .route(
                 "/books/delete/{id}",

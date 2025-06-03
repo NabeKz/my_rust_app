@@ -1,8 +1,16 @@
 use std::{str::FromStr, sync::Arc};
 
+use serde::Deserialize;
 use uuid::Uuid;
 
+use crate::router::html;
+
 use super::model::{Book, BookRepository};
+
+#[derive(Deserialize)]
+pub struct FormData {
+    name: String,
+}
 
 #[derive(Clone)]
 pub struct BookGetController {
@@ -21,24 +29,30 @@ impl BookGetController {
     }
 }
 
+pub fn find_success(item: Book) -> String {
+    let action = format!("/books/update/{}", item.id);
+    html::put_form(&action, html::input("name", &item.name.to_string()))
+}
+
 pub fn find(controller: &BookGetController, id: String) -> String {
     let uuid = Uuid::from_str(&id).unwrap();
     let item = controller.invoke(uuid);
-    let result = match item {
-        Result::Ok(_) => "ok",
-        Result::Err(_) => "ng",
-    };
-    result.to_string()
+    match item {
+        Result::Ok(item) => find_success(item),
+        Result::Err(_) => "ng".to_string(),
+    }
 }
 
-pub fn update(controller: &BookGetController, id: String) -> Result<(), String> {
+pub fn update(controller: &BookGetController, id: String, form: &FormData) -> Result<(), String> {
     let uuid = Uuid::from_str(&id).unwrap();
     let item = controller.invoke(uuid);
     if item.is_err() {
         return Err("not found".to_string());
     }
+    let mut item = item.unwrap();
+    item.name = form.name.clone();
 
-    let result = controller.update(item.unwrap());
+    let result = controller.update(item);
     match result {
         Ok(_) => Ok(()),
         Err(err) => Err(err),
