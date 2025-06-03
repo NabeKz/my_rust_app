@@ -107,13 +107,16 @@ async fn main() -> std::io::Result<()> {
                            path: Path<String>,
                            form: Form<book::update::FormData>| {
                         let id = path.into_inner();
-                        let result = book::update::update(&data.book_update, id, &form);
+                        let result = book::update::update(&data.book_update, id.clone(), &form);
                         match result {
                             Ok(()) => HttpResponse::SeeOther()
                                 .append_header((header::LOCATION, "/books"))
                                 .finish(),
                             Err(_) => HttpResponse::SeeOther()
-                                .append_header((header::LOCATION, "/books"))
+                                .append_header((
+                                    header::LOCATION,
+                                    format!("/books/update/{}", id.clone()),
+                                ))
                                 .finish(),
                         }
                     },
