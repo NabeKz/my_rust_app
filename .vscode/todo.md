@@ -1,4 +1,4 @@
-[ ] - refactor main.rs
+[x] - refactor main.rs
 [ ] - to functional
 [ ] - to monorepo
 [ ] - create html in method chain

@@ -72,32 +72,11 @@ async fn main() -> std::io::Result<()> {
             )
             .route(
                 "/books/update/{id}",
-                web::get().to(async |data: Data<Context>, path: Path<String>| {
-                    let id = path.into_inner();
-                    book::update::find(&data.book_update, id).html()
-                }),
+                web::get().to(presentation::book::pages::update::index),
             )
             .route(
                 "/books/update/{id}",
-                web::put().to(
-                    async |data: Data<Context>,
-                           path: Path<String>,
-                           form: Form<book::update::FormData>| {
-                        let id = path.into_inner();
-                        let result = book::update::update(&data.book_update, id.clone(), &form);
-                        match result {
-                            Ok(()) => HttpResponse::SeeOther()
-                                .append_header((header::LOCATION, "/books"))
-                                .finish(),
-                            Err(_) => HttpResponse::SeeOther()
-                                .append_header((
-                                    header::LOCATION,
-                                    format!("/books/update/{}", id.clone()),
-                                ))
-                                .finish(),
-                        }
-                    },
-                ),
+                web::put().to(presentation::book::pages::update::command),
             )
             .route(
                 "/books/delete/{id}",
