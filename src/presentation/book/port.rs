@@ -1,9 +1,7 @@
-use std::sync::Arc;
-
-use actix_web::{Result, web::Data};
+use actix_web::{HttpResponse, Result, web::Data};
 
 use super::handler;
-use crate::domain::book::{Book, BookRepository};
+use crate::{domain::book::Book, handler::Context, presentation::shared::Html};
 
 fn td(book: &Book) -> String {
     format!(
@@ -40,10 +38,8 @@ fn index(books: Vec<Book>) -> String {
     )
 }
 
-pub async fn get_books<T>(data: Data<Arc<T>>) -> Result<String>
-where
-    T: BookRepository,
-{
-    let books = handler::get_books(data.get_ref().clone()).await;
-    Result::Ok(index(books))
+pub async fn get_books(data: Data<Context>) -> Result<HttpResponse> {
+    let repository = data.book.clone();
+    let books = handler::get_books(repository).await;
+    Result::Ok(index(books).html())
 }

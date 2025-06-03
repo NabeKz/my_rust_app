@@ -11,6 +11,7 @@ use actix_web::{
 
 use my_rust_app::{
     handler::Context,
+    presentation,
     web_router::book::{self},
 };
 
@@ -85,10 +86,7 @@ async fn main() -> std::io::Result<()> {
                 "/",
                 web::get().to(async || -> HttpResponse { home().html() }),
             )
-            .route(
-                "/books",
-                web::get().to(async |data: Data<Context>| book::list::index(&data.book).html()),
-            )
+            .route("/books", web::get().to(presentation::book::get_books))
             .route(
                 "/books/create",
                 web::get().to(async |_data: Data<Context>| book::create::index().html()),
