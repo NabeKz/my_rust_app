@@ -5,3 +5,4 @@
 [ ] - add test
 [ ] - refactor method_override
 [ ] - commonize create and update
+[ ] - scoped route

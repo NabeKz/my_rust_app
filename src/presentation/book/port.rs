@@ -1,15 +1,18 @@
 use actix_web::{HttpResponse, Result, web::Data};
 
 use super::handler;
-use crate::{domain::book::Book, handler::Context, presentation::shared::Html};
+use crate::features::shared::Html;
+use crate::{domain::book::Book, handler::Context};
 
 fn td(book: &Book) -> String {
     format!(
         "
         <td>{}</td>
         <td>{}</td>
+        <td>{}</td>
+        <td>{}</td>
         ",
-        book.id, book.name,
+        book.id, book.name, "edit", "delete"
     )
 }
 

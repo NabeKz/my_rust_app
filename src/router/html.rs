@@ -43,3 +43,44 @@ pub fn input(id: &str, value: &str) -> String {
         id, id, id, id, value
     )
 }
+
+pub fn link(href: String, text: String) -> String {
+    format!("<a href={} >{}</a>", href, text)
+}
+
+pub fn t_head(headers: Vec<String>) -> String {
+    headers
+        .iter()
+        .map(|header| format!("<th>{}</td>", header))
+        .collect::<Vec<String>>()
+        .join("")
+}
+
+pub fn t_data(bodies: Vec<Vec<String>>, f: fn(&Vec<String>) -> String) -> String {
+    bodies
+        .iter()
+        .map(|body| format!("<tr>{}</tr>", f(body)))
+        .collect::<Vec<String>>()
+        .join("")
+}
+
+pub fn table(
+    headers: Vec<String>,
+    bodies: Vec<Vec<String>>,
+    f: fn(&Vec<String>) -> String,
+) -> String {
+    format!(
+        "
+    <table>
+        <thead>
+            <tr>{}</tr>
+        </thead>
+        <tbody>
+            {}
+        </tbody>
+    </table>
+    ",
+        t_head(headers),
+        t_data(bodies, f)
+    )
+}

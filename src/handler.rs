@@ -2,13 +2,12 @@ use std::sync::Arc;
 
 use actix_web::web;
 
-use crate::{
-    infra::book::on_memory,
-    router::book::{
-        create::BookCreateController, delete::BookDeleteController, list::BookListController,
-        model::BookRepositoryOnMemory, update::BookGetController,
-    },
+use crate::router::book::{
+    create::BookCreateController, delete::BookDeleteController, model::BookRepositoryOnMemory,
+    update::BookGetController,
 };
+
+use crate::features::book::infra::on_memory;
 
 pub fn config(conf: &mut web::ServiceConfig) {
     let scope = web::scope("/");
