@@ -5,7 +5,7 @@ use actix_web::{
 };
 
 use crate::{
-    features::book::{model::Book, usecase::FormData},
+    features::book::usecase::{self, CreateDto},
     handler::Context,
     presentation::shared::Html,
     router::html::{input, post_form},
@@ -16,11 +16,16 @@ pub async fn query() -> HttpResponse {
     post_form("/books/create", content).to_string().html()
 }
 
-pub async fn command(data: Data<Context>, form: Form<FormData>) -> HttpResponse {
-    let book = Book::from_values(form.name.clone());
-    let _ = data.book_create.save(book);
-
+fn success() -> HttpResponse {
     HttpResponse::SeeOther()
         .append_header((header::LOCATION, "/books"))
         .finish()
+}
+pub async fn command(data: Data<Context>, form: Form<CreateDto>) -> HttpResponse {
+    let result = usecase::create_user(data.book_create.as_ref(), form.into_inner()).await;
+
+    match result {
+        Result::Ok(_) => success(),
+        Result::Err(_) => success(),
+    }
 }
