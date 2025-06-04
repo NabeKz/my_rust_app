@@ -1,15 +1,10 @@
-use std::sync::Arc;
-
-use actix_web::{HttpResponse, Result, web::Data};
+use actix_web::{HttpResponse, web::Data};
 
 use super::super::handler;
 use crate::features::book::model::Book;
-use crate::features::book::model::BookRepository;
+use crate::handler::Context;
 use crate::presentation::shared::Html;
-
-pub struct Deps {
-    book: Arc<dyn BookRepository>,
-}
+use crate::router::html;
 
 fn td(book: &Book) -> String {
     format!(
@@ -19,37 +14,16 @@ fn td(book: &Book) -> String {
         <td>{}</td>
         <td>{}</td>
         ",
-        book.id, book.name, "edit", "delete"
+        book.id,
+        book.name,
+        html::link(book.id.to_string(), "edit".to_string()),
+        html::delete_form(format!("/books/delete/{}", book.id), "".to_string())
     )
 }
 
-fn index(books: Vec<Book>) -> String {
-    let items = books
-        .iter()
-        .map(|it| format!("<tr>{}</tr>", td(&it)))
-        .collect::<String>();
-    format!(
-        "
-    <table>
-        <thead>
-            <tr>
-                <th>id</th>
-                <th>name</th>
-                <th>edit</th>
-                <th>delete</th>
-            </tr>
-        </thead>
-        <tbody>
-        {}
-        </tbody>
-    </table>
-    ",
-        items
-    )
-}
-
-pub async fn get_books(data: Data<Deps>) -> Result<HttpResponse> {
+pub async fn index(data: Data<Context>) -> HttpResponse {
     let repository = data.book.clone();
     let books = handler::get_books(repository).await;
-    Result::Ok(index(books).html())
+    let table = html::table(vec!["id", "name", "edit", "delete"], books, td);
+    table.html()
 }

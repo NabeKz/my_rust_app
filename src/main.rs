@@ -65,27 +65,30 @@ async fn main() -> std::io::Result<()> {
                 srv.call(req)
             })
             .route("/", web::get().to(home))
-            .route("/books", web::get().to(presentation::book::get_books))
             .route(
-                "/books/create",
-                web::get().to(presentation::book::pages::create::index),
+                "/books",
+                web::get().to(presentation::book::pages::list::index),
             )
-            .route(
-                "/books/update/{id}",
-                web::get().to(presentation::book::pages::update::index),
-            )
-            .route(
-                "/books/update/{id}",
-                web::put().to(presentation::book::pages::update::command),
-            )
-            .route(
-                "/books/delete/{id}",
-                web::delete().to(presentation::book::pages::delete::command),
-            )
-            .route(
-                "/books/create",
-                web::post().to(presentation::book::pages::create::command),
-            )
+        // .route(
+        //     "/books/create",
+        //     web::get().to(presentation::book::pages::create::index),
+        // )
+        // .route(
+        //     "/books/update/{id}",
+        //     web::get().to(presentation::book::pages::update::index),
+        // )
+        // .route(
+        //     "/books/update/{id}",
+        //     web::put().to(presentation::book::pages::update::command),
+        // )
+        // .route(
+        //     "/books/delete/{id}",
+        //     web::delete().to(presentation::book::pages::delete::command),
+        // )
+        // .route(
+        //     "/books/create",
+        //     web::post().to(presentation::book::pages::create::command),
+        // )
     })
     .bind((url, port))?
     .run()
