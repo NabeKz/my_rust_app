@@ -9,7 +9,10 @@ use serde::Deserialize;
 use uuid::Uuid;
 
 use crate::{
-    features::book::model::Book, handler::Context, presentation::shared::Html, router::html,
+    features::book::{model::Book, usecase},
+    handler::Context,
+    presentation::shared::Html,
+    router::html,
 };
 
 #[derive(Deserialize)]
@@ -24,8 +27,7 @@ pub fn find_success(item: Book) -> String {
 
 pub async fn query(data: Data<Context>, path: Path<String>) -> HttpResponse {
     let id = path.into_inner();
-    let uuid = Uuid::from_str(&id).unwrap();
-    let item = data.book_update.find(uuid);
+    let item = usecase::get_user(data.book_update.as_ref(), id).await;
     let response = match item {
         Result::Ok(item) => find_success(item),
         Result::Err(_) => "ng".to_string(),
