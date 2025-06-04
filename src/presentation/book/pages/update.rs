@@ -9,14 +9,8 @@ use serde::Deserialize;
 use uuid::Uuid;
 
 use crate::{
-    features::book::model::{Book, BookRepository},
-    presentation::shared::Html,
-    router::html,
+    features::book::model::Book, handler::Context, presentation::shared::Html, router::html,
 };
-
-pub struct Deps {
-    book_update: dyn BookRepository,
-}
 
 #[derive(Deserialize)]
 pub struct FormData {
@@ -28,7 +22,7 @@ pub fn find_success(item: Book) -> String {
     html::put_form(&action, html::input("name", &item.name.to_string()))
 }
 
-pub async fn index(data: Data<Deps>, path: Path<String>) -> HttpResponse {
+pub async fn query(data: Data<Context>, path: Path<String>) -> HttpResponse {
     let id = path.into_inner();
     let uuid = Uuid::from_str(&id).unwrap();
     let item = data.book_update.find(uuid);
@@ -39,7 +33,11 @@ pub async fn index(data: Data<Deps>, path: Path<String>) -> HttpResponse {
     response.html()
 }
 
-pub async fn command(data: Data<Deps>, path: Path<String>, form: Form<FormData>) -> HttpResponse {
+pub async fn command(
+    data: Data<Context>,
+    path: Path<String>,
+    form: Form<FormData>,
+) -> HttpResponse {
     let id = path.into_inner();
     let uuid = Uuid::from_str(&id).unwrap();
     let item = data.book_update.find(uuid);

@@ -69,26 +69,26 @@ async fn main() -> std::io::Result<()> {
                 "/books",
                 web::get().to(presentation::book::pages::list::index),
             )
-        // .route(
-        //     "/books/create",
-        //     web::get().to(presentation::book::pages::create::index),
-        // )
-        // .route(
-        //     "/books/update/{id}",
-        //     web::get().to(presentation::book::pages::update::index),
-        // )
-        // .route(
-        //     "/books/update/{id}",
-        //     web::put().to(presentation::book::pages::update::command),
-        // )
-        // .route(
-        //     "/books/delete/{id}",
-        //     web::delete().to(presentation::book::pages::delete::command),
-        // )
-        // .route(
-        //     "/books/create",
-        //     web::post().to(presentation::book::pages::create::command),
-        // )
+            .route(
+                "/books/create",
+                web::get().to(presentation::book::pages::create::index),
+            )
+            .route(
+                "/books/{id}",
+                web::get().to(presentation::book::pages::update::query),
+            )
+            .route(
+                "/books/{id}",
+                web::put().to(presentation::book::pages::update::command),
+            )
+            .route(
+                "/books/delete/{id}",
+                web::delete().to(presentation::book::pages::delete::command),
+            )
+            .route(
+                "/books/create",
+                web::post().to(presentation::book::pages::create::command),
+            )
     })
     .bind((url, port))?
     .run()

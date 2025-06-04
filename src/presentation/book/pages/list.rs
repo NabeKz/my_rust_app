@@ -16,7 +16,7 @@ fn td(book: &Book) -> String {
         ",
         book.id,
         book.name,
-        html::link(book.id.to_string(), "edit".to_string()),
+        html::link(format!("/books/{}", book.id.clone()), "edit".to_string()),
         html::delete_form(format!("/books/delete/{}", book.id), "".to_string())
     )
 }
