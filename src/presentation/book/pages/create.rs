@@ -5,9 +5,9 @@ use actix_web::{
 };
 
 use crate::{
-    features::book::model::Book,
+    features::book::{model::Book, usecase::FormData},
     handler::Context,
-    presentation::{book::handler::FormData, shared::Html},
+    presentation::shared::Html,
     router::html::{input, post_form},
 };
 
