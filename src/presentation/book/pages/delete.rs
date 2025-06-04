@@ -4,17 +4,17 @@ use actix_web::{
     web::{Data, Path},
 };
 
-use std::str::FromStr;
-use uuid::Uuid;
+use crate::{features::book::usecase, handler::Context};
 
-use crate::handler::Context;
-
-pub async fn command(data: Data<Context>, path: Path<String>) -> HttpResponse {
-    let id = path.into_inner();
-    let uuid = Uuid::from_str(&id).unwrap();
-    let _ = data.book_create.delete(uuid);
-
+fn success() -> HttpResponse {
     HttpResponse::SeeOther()
         .append_header((header::LOCATION, "/books"))
         .finish()
+}
+
+pub async fn command(data: Data<Context>, path: Path<String>) -> HttpResponse {
+    let id = path.into_inner();
+    let _ = usecase::delete_user(data.book_delete.as_ref(), id);
+
+    success()
 }

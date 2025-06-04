@@ -1,4 +1,7 @@
+use std::str::FromStr;
+
 use serde::Deserialize;
+use uuid::Uuid;
 
 use crate::features::book::model::{Book, BookRepository};
 
@@ -14,5 +17,11 @@ pub async fn get_users(repository: &dyn BookRepository) -> Vec<Book> {
 pub async fn create_user(repo: &dyn BookRepository, dto: CreateDto) -> Result<(), Vec<String>> {
     let book = Book::from_values(dto.name);
     let _ = repo.save(book);
+    Ok(())
+}
+
+pub async fn delete_user(repo: &dyn BookRepository, id: String) -> Result<(), Vec<String>> {
+    let uuid = Uuid::from_str(&id).unwrap();
+    let _ = repo.delete(uuid);
     Ok(())
 }
