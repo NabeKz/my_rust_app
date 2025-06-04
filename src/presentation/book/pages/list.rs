@@ -21,7 +21,7 @@ fn td(book: &Book) -> String {
     )
 }
 
-pub async fn index(data: Data<Context>) -> HttpResponse {
+pub async fn query(data: Data<Context>) -> HttpResponse {
     let repository = data.book.as_ref();
     let books = usecase::get_users(repository).await;
     let table = html::table(vec!["id", "name", "edit", "delete"], books, td);

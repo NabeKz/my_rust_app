@@ -11,7 +11,7 @@ use crate::{
     router::html::{input, post_form},
 };
 
-pub async fn index() -> HttpResponse {
+pub async fn query() -> HttpResponse {
     let content = input("name", "");
     post_form("/books/create", content).to_string().html()
 }

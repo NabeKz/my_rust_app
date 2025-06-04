@@ -67,11 +67,11 @@ async fn main() -> std::io::Result<()> {
             .route("/", web::get().to(home))
             .route(
                 "/books",
-                web::get().to(presentation::book::pages::list::index),
+                web::get().to(presentation::book::pages::list::query),
             )
             .route(
                 "/books/create",
-                web::get().to(presentation::book::pages::create::index),
+                web::get().to(presentation::book::pages::create::query),
             )
             .route(
                 "/books/{id}",
