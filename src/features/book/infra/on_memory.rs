@@ -38,13 +38,13 @@ impl BookRepository for BookRepositoryOnMemory {
         }
     }
 
-    fn update(&self, book: Book) -> Result<(), String> {
+    fn update(&self, book: Book) -> Result<(), Vec<String>> {
         let mut items = self.items.lock().unwrap();
         if let Some(pos) = items.iter().position(|it| it.id == book.id) {
             items[pos] = book;
             Ok(())
         } else {
-            Err("not found".to_string())
+            Err(vec!["not found".to_string()])
         }
     }
 }
