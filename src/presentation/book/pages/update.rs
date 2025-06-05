@@ -1,6 +1,5 @@
 use actix_web::{
     HttpResponse,
-    http::header,
     web::{Data, Form, Path},
 };
 
@@ -10,8 +9,7 @@ use crate::{
         usecase::{self, UpdateDto},
     },
     handler::Context,
-    presentation::shared::Html,
-    router::html,
+    presentation::shared::html::{self, HtmlResponse},
 };
 
 pub fn find_success(item: Book) -> String {
@@ -37,11 +35,7 @@ pub async fn command(
     let id = path.into_inner();
     let result = usecase::update_user(data.book_update.as_ref(), id, form.into_inner()).await;
     match result {
-        Result::Ok(_) => HttpResponse::SeeOther()
-            .append_header((header::LOCATION, "/books"))
-            .finish(),
-        Result::Err(_) => HttpResponse::SeeOther()
-            .append_header((header::LOCATION, "/books"))
-            .finish(),
+        Result::Ok(_) => html::redirect("/books"),
+        Result::Err(_) => html::redirect("/books"),
     }
 }

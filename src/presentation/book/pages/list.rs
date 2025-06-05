@@ -3,7 +3,7 @@ use actix_web::{HttpResponse, web::Data};
 use crate::features::book::model::Book;
 use crate::features::book::usecase;
 use crate::handler::Context;
-use crate::presentation::shared::Html;
+use crate::presentation::shared::html::HtmlResponse;
 use crate::router::html;
 
 fn td(book: &Book) -> String {

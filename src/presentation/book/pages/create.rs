@@ -7,7 +7,7 @@ use actix_web::{
 use crate::{
     features::book::usecase::{self, CreateDto},
     handler::Context,
-    presentation::shared::Html,
+    presentation::shared::html::HtmlResponse,
     router::html::{input, post_form},
 };
 

@@ -1,19 +1,14 @@
 use actix_web::{
     App, HttpResponse, HttpServer,
     dev::Service,
-    http::{
-        Method,
-        header::{self, ContentType},
-    },
+    http::{Method, header::ContentType},
     middleware,
-    web::{self, Data, Form, Path},
+    web::{self, Data},
 };
 
 use my_rust_app::{
     handler::Context,
-    presentation,
-    presentation::shared::Html,
-    web_router::book::{self},
+    presentation::{self, shared::html::HtmlResponse},
 };
 
 pub async fn home() -> HttpResponse {

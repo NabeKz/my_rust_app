@@ -4,3 +4,6 @@ run = """
   SIGTERM --exts rs --watch src/ -- "cargo run"
 """
 description = "run the CLI"
+
+[tasks.format]
+run = "cargo fix --allow-dirty"
