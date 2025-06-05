@@ -9,6 +9,7 @@ use crate::features::book::model::{Book, BookRepository};
 pub struct CreateDto {
     pub name: String,
 }
+#[derive(Deserialize)]
 pub struct UpdateDto {
     pub name: String,
 }
