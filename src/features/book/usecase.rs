@@ -33,7 +33,15 @@ pub async fn update_user(
     id: String,
     dto: UpdateDto,
 ) -> Result<(), Vec<String>> {
-    todo!()
+    let uuid = Uuid::from_str(&id).unwrap();
+    let item = repo.find(uuid);
+    if item.is_err() {
+        return Result::Err(vec!["ng".to_string()]);
+    }
+    let mut item = item.unwrap();
+    item.name = dto.name;
+
+    repo.update(item)
 }
 
 pub async fn delete_user(repo: &dyn BookRepository, id: String) -> Result<(), Vec<String>> {

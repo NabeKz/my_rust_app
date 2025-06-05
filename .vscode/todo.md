@@ -7,3 +7,5 @@
 [ ] - commonize create and update
 [ ] - scoped route
 [ ] - fix dependency flow
+[ ] - handler error in infra layer
+[ ] - validate on create and update
