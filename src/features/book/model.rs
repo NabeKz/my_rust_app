@@ -1,5 +1,5 @@
-use uuid::Uuid;
 use std::fmt;
+use uuid::Uuid;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct BookName(String);
@@ -30,10 +30,14 @@ impl BookName {
     pub fn new<S: Into<String>>(name: S) -> DomainResult<Self> {
         let name = name.into();
         if name.trim().is_empty() {
-            return Err(DomainError::InvalidBookName("Name cannot be empty".to_string()));
+            return Err(DomainError::InvalidBookName(
+                "Name cannot be empty".to_string(),
+            ));
         }
         if name.len() > 255 {
-            return Err(DomainError::InvalidBookName("Name cannot exceed 255 characters".to_string()));
+            return Err(DomainError::InvalidBookName(
+                "Name cannot exceed 255 characters".to_string(),
+            ));
         }
         Ok(BookName(name.trim().to_string()))
     }
@@ -45,7 +49,7 @@ impl BookName {
 
 impl BookId {
     pub fn new() -> Self {
-        BookId(Uuid::new_v4())
+        Self::default()
     }
 
     pub fn from_uuid(uuid: Uuid) -> Self {
@@ -54,6 +58,12 @@ impl BookId {
 
     pub fn value(&self) -> Uuid {
         self.0
+    }
+}
+
+impl Default for BookId {
+    fn default() -> Self {
+        Self(Uuid::new_v4())
     }
 }
 
