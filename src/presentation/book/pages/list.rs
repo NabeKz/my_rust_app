@@ -15,15 +15,14 @@ fn td(book: &Book) -> String {
         ",
         book.id,
         book.name,
-        html::link(format!("/books/{}", book.id.clone()), "edit".to_string()),
-        "",
-        // html::delete_form(format!("/books/delete/{}", book.id), "".to_string())
+        html::link(format!("/books/{}", book.id), "edit".to_string()),
+        html::delete_form(format!("/books/{}", book.id), "")
     )
 }
 
 pub async fn query(data: Data<Context>) -> HttpResponse {
     let repository = data.book.as_ref();
-    let books = usecase::get_users(repository).await;
+    let books = usecase::get_books(repository).await;
     let table = html::table(vec!["id", "name", "edit", "delete"], books, td);
     table.html()
 }

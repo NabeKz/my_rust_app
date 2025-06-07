@@ -77,7 +77,7 @@ async fn main() -> std::io::Result<()> {
                 web::put().to(presentation::book::pages::update::command),
             )
             .route(
-                "/books/delete/{id}",
+                "/books/{id}",
                 web::delete().to(presentation::book::pages::delete::command),
             )
             .route(

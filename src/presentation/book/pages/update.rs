@@ -19,7 +19,7 @@ pub fn find_success(item: Book) -> String {
 
 pub async fn query(data: Data<Context>, path: Path<String>) -> HttpResponse {
     let id = path.into_inner();
-    let item = usecase::get_user(data.book.as_ref(), id).await;
+    let item = usecase::get_book(data.book.as_ref(), id).await;
     let response = match item {
         Result::Ok(item) => find_success(item),
         Result::Err(_) => "ng".to_string(),
@@ -33,7 +33,7 @@ pub async fn command(
     form: Form<UpdateDto>,
 ) -> HttpResponse {
     let id = path.into_inner();
-    let result = usecase::update_user(data.book.as_ref(), id, form.into_inner()).await;
+    let result = usecase::update_book(data.book.as_ref(), id, form.into_inner()).await;
     match result {
         Result::Ok(_) => html::redirect("/books"),
         Result::Err(_) => html::redirect("/books"),

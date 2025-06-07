@@ -14,22 +14,22 @@ pub struct UpdateDto {
     pub name: String,
 }
 
-pub async fn get_users(repository: &dyn BookRepository) -> Vec<Book> {
+pub async fn get_books(repository: &dyn BookRepository) -> Vec<Book> {
     repository.list()
 }
 
-pub async fn get_user(repo: &dyn BookRepository, id: String) -> Result<Book, String> {
+pub async fn get_book(repo: &dyn BookRepository, id: String) -> Result<Book, String> {
     let uuid = Uuid::from_str(&id).unwrap();
     repo.find(uuid)
 }
 
-pub async fn create_user(repo: &dyn BookRepository, dto: CreateDto) -> Result<(), Vec<String>> {
+pub async fn create_book(repo: &dyn BookRepository, dto: CreateDto) -> Result<(), Vec<String>> {
     let book = Book::from_values(dto.name);
     let _ = repo.save(book);
     Ok(())
 }
 
-pub async fn update_user(
+pub async fn update_book(
     repo: &dyn BookRepository,
     id: String,
     dto: UpdateDto,
@@ -45,7 +45,7 @@ pub async fn update_user(
     repo.update(item)
 }
 
-pub async fn delete_user(repo: &dyn BookRepository, id: String) -> Result<(), Vec<String>> {
+pub async fn delete_book(repo: &dyn BookRepository, id: String) -> Result<(), Vec<String>> {
     let uuid = Uuid::from_str(&id).unwrap();
     let _ = repo.delete(uuid);
     Ok(())
