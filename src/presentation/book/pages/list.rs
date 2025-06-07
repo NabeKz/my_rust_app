@@ -13,10 +13,10 @@ fn td(book: &Book) -> String {
         <td>{}</td>
         <td>{}</td>
         ",
-        book.id,
-        book.name,
-        html::link(format!("/books/{}", book.id), "edit".to_string()),
-        html::delete_form(format!("/books/{}", book.id), "")
+        book.id().value(),
+        book.name().value(),
+        html::link(format!("/books/{}", book.id().value()), "edit".to_string()),
+        html::delete_form(format!("/books/{}", book.id().value()), "")
     )
 }
 

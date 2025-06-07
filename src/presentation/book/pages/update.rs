@@ -13,8 +13,8 @@ use crate::{
 };
 
 pub fn find_success(item: Book) -> String {
-    let action = format!("/books/{}", item.id);
-    html::put_form(&action, html::input("name", &item.name.to_string()))
+    let action = format!("/books/{}", item.id().value());
+    html::put_form(&action, html::input("name", item.name().value()))
 }
 
 pub async fn query(data: Data<Context>, path: Path<String>) -> HttpResponse {
