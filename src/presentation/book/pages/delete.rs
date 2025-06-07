@@ -14,7 +14,7 @@ fn success() -> HttpResponse {
 
 pub async fn command(data: Data<Context>, path: Path<String>) -> HttpResponse {
     let id = path.into_inner();
-    let _ = usecase::delete_book(data.book.as_ref(), id);
+    let _ = usecase::delete_book(data.book.clone(), id).await;
 
     success()
 }

@@ -23,11 +23,6 @@ impl BookRepository for BookRepositoryOnMemory {
     fn save(&self, item: Book) -> () {
         let _ = self.items.lock().unwrap().push(item);
     }
-    fn delete(&self, id: Uuid) -> () {
-        let mut items = self.items.lock().unwrap();
-        // TODO: handle not found
-        items.retain(|it| it.id != id);
-    }
 
     fn find(&self, id: Uuid) -> Result<Book, String> {
         let items = self.items.lock().unwrap();
@@ -46,5 +41,11 @@ impl BookRepository for BookRepositoryOnMemory {
         } else {
             Err(vec!["not found".to_string()])
         }
+    }
+
+    fn delete(&self, id: Uuid) -> () {
+        let mut items = self.items.lock().unwrap();
+        // TODO: handle not found
+        items.retain(|it| it.id != id);
     }
 }

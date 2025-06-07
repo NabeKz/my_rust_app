@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{str::FromStr, sync::Arc};
 
 use serde::Deserialize;
 use uuid::Uuid;
@@ -45,7 +45,7 @@ pub async fn update_book(
     repo.update(item)
 }
 
-pub async fn delete_book(repo: &dyn BookRepository, id: String) -> Result<(), Vec<String>> {
+pub async fn delete_book(repo: Arc<dyn BookRepository>, id: String) -> Result<(), Vec<String>> {
     let uuid = Uuid::from_str(&id).unwrap();
     let _ = repo.delete(uuid);
     Ok(())

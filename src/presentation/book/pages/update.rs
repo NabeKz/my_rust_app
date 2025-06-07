@@ -13,7 +13,7 @@ use crate::{
 };
 
 pub fn find_success(item: Book) -> String {
-    let action = format!("/books/update/{}", item.id);
+    let action = format!("/books/{}", item.id);
     html::put_form(&action, html::input("name", &item.name.to_string()))
 }
 
