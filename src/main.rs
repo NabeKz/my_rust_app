@@ -6,11 +6,7 @@ use actix_web::{
     web::Data,
 };
 
-use my_rust_app::{
-    context::Context,
-    router,
-};
-
+use my_rust_app::{context::Context, router};
 
 fn method_override(method: &Method, query: String) -> Method {
     let vec: Vec<&str> = query.split("_method=").collect();
