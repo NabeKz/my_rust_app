@@ -10,7 +10,7 @@ pub struct Context {
 
 impl Context {
     pub fn init() -> Self {
-        let repository = Arc::new(on_memory::BookRepositoryOnMemory::new());
+        let repository = Arc::new(on_memory::BookRepositoryOnMemory::default());
         Self {
             book: repository.clone(),
         }

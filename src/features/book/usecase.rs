@@ -25,7 +25,7 @@ pub async fn get_book(repo: &dyn BookRepository, id: String) -> Result<Book, Str
 
 pub async fn create_book(repo: &dyn BookRepository, dto: CreateDto) -> Result<(), Vec<String>> {
     let book = Book::from_values(dto.name);
-    let _ = repo.save(book);
+    repo.save(book);
     Ok(())
 }
 
@@ -47,6 +47,6 @@ pub async fn update_book(
 
 pub async fn delete_book(repo: Arc<dyn BookRepository>, id: String) -> Result<(), Vec<String>> {
     let uuid = Uuid::from_str(&id).unwrap();
-    let _ = repo.delete(uuid);
+    repo.delete(uuid);
     Ok(())
 }

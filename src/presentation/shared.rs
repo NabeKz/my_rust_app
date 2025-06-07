@@ -35,15 +35,15 @@ pub mod html {
     }
 
     enum Method {
-        POST,
-        PUT,
-        DELETE,
+        Post,
+        Put,
+        Delete,
     }
 
     fn form(method: Method, action: &str, content: String) -> String {
         let action = match method {
-            Method::PUT => action.to_owned() + "?_method=PUT",
-            Method::DELETE => action.to_owned() + "?_method=DELETE",
+            Method::Put => action.to_owned() + "?_method=Put",
+            Method::Delete => action.to_owned() + "?_method=Delete",
             _ => action.to_owned(),
         };
 
@@ -60,13 +60,13 @@ pub mod html {
         )
     }
     pub fn post_form(action: &str, content: String) -> String {
-        form(Method::POST, action, content)
+        form(Method::Post, action, content)
     }
     pub fn put_form(action: &str, content: String) -> String {
-        form(Method::PUT, action, content)
+        form(Method::Put, action, content)
     }
     pub fn delete_form(action: String, content: &str) -> String {
-        form(Method::DELETE, &action, content.to_string())
+        form(Method::Delete, &action, content.to_string())
     }
 
     pub fn input(id: &str, value: &str) -> String {

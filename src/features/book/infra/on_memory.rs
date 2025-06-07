@@ -7,8 +7,8 @@ pub struct BookRepositoryOnMemory {
     items: Arc<Mutex<Vec<Book>>>,
 }
 
-impl BookRepositoryOnMemory {
-    pub fn new() -> Self {
+impl Default for BookRepositoryOnMemory {
+    fn default() -> Self {
         let items = vec![Book::new("hoge"), Book::new("fuga")];
         Self {
             items: Arc::new(Mutex::new(items)),
@@ -20,8 +20,8 @@ impl BookRepository for BookRepositoryOnMemory {
     fn list(&self) -> Vec<Book> {
         self.items.lock().unwrap().clone()
     }
-    fn save(&self, item: Book) -> () {
-        let _ = self.items.lock().unwrap().push(item);
+    fn save(&self, item: Book) {
+        self.items.lock().unwrap().push(item)
     }
 
     fn find(&self, id: Uuid) -> Result<Book, String> {
@@ -43,7 +43,7 @@ impl BookRepository for BookRepositoryOnMemory {
         }
     }
 
-    fn delete(&self, id: Uuid) -> () {
+    fn delete(&self, id: Uuid) {
         let mut items = self.items.lock().unwrap();
         // TODO: handle not found
         items.retain(|it| it.id != id);
