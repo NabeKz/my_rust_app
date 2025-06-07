@@ -9,3 +9,6 @@
 [ ] - fix dependency flow
 [ ] - handler error in infra layer
 [ ] - validate on create and update
+[ ] - implements db adaptor
+[ ] - documentation
+[ ] - return json response

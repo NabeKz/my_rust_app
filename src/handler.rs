@@ -20,9 +20,6 @@ pub fn config(conf: &mut web::ServiceConfig) {
 
 pub struct Context {
     pub book: Arc<dyn BookRepository>,
-    pub book_create: Arc<dyn BookRepository>,
-    pub book_update: Arc<dyn BookRepository>,
-    pub book_delete: Arc<dyn BookRepository>,
 }
 
 impl Context {
@@ -30,9 +27,6 @@ impl Context {
         let repository = Arc::new(on_memory::BookRepositoryOnMemory::new());
         Self {
             book: repository.clone(),
-            book_create: repository.clone(),
-            book_update: repository.clone(),
-            book_delete: repository.clone(),
         }
     }
 }
