@@ -7,8 +7,7 @@ use actix_web::{
 use crate::{
     features::book::usecase::{self, CreateDto},
     handler::Context,
-    presentation::shared::html::HtmlResponse,
-    router::html::{input, post_form},
+    presentation::shared::html::{HtmlResponse, input, post_form},
 };
 
 pub async fn query() -> HttpResponse {

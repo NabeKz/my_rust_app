@@ -84,7 +84,7 @@ pub mod html {
         format!("<a href={} >{}</a>", href, text)
     }
 
-    pub fn t_head(headers: Vec<String>) -> String {
+    pub fn t_head(headers: Vec<&str>) -> String {
         headers
             .iter()
             .map(|header| format!("<th>{}</td>", header))
@@ -92,7 +92,7 @@ pub mod html {
             .join("")
     }
 
-    pub fn t_data(bodies: Vec<Vec<String>>, f: fn(&Vec<String>) -> String) -> String {
+    pub fn t_data<T>(bodies: Vec<T>, f: fn(&T) -> String) -> String {
         bodies
             .iter()
             .map(|body| format!("<tr>{}</tr>", f(body)))
@@ -100,11 +100,7 @@ pub mod html {
             .join("")
     }
 
-    pub fn table(
-        headers: Vec<String>,
-        bodies: Vec<Vec<String>>,
-        f: fn(&Vec<String>) -> String,
-    ) -> String {
+    pub fn table<T>(headers: Vec<&str>, bodies: Vec<T>, f: fn(&T) -> String) -> String {
         format!(
             "
     <table>

@@ -3,8 +3,7 @@ use actix_web::{HttpResponse, web::Data};
 use crate::features::book::model::Book;
 use crate::features::book::usecase;
 use crate::handler::Context;
-use crate::presentation::shared::html::HtmlResponse;
-use crate::router::html;
+use crate::presentation::shared::html::{self, HtmlResponse};
 
 fn td(book: &Book) -> String {
     format!(
@@ -17,7 +16,8 @@ fn td(book: &Book) -> String {
         book.id,
         book.name,
         html::link(format!("/books/{}", book.id.clone()), "edit".to_string()),
-        html::delete_form(format!("/books/delete/{}", book.id), "".to_string())
+        "",
+        // html::delete_form(format!("/books/delete/{}", book.id), "".to_string())
     )
 }
 
