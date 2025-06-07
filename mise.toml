@@ -7,3 +7,6 @@ description = "run the CLI"
 
 [tasks.format]
 run = "cargo fix --allow-dirty"
+
+[tasks.lint]
+run = "cargo clippy -- -D warnings"

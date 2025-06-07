@@ -1,35 +1,16 @@
 use actix_web::{
-    App, HttpResponse, HttpServer,
+    App, HttpServer,
     dev::Service,
     http::{Method, header::ContentType},
     middleware,
-    web::{self, Data},
+    web::Data,
 };
 
 use my_rust_app::{
-    handler::Context,
-    presentation::{self, shared::html::HtmlResponse},
+    context::Context,
+    router,
 };
 
-pub async fn home() -> HttpResponse {
-    r"
-    <div>
-        <ul>
-            <li>
-                <a href=books >books</a>
-            </li>
-            <li>
-                <a href=books/create >books create</a>
-            </li>
-            <li>
-                <a href=books/delete >books delete</a>
-            </li>
-        </ul>
-    </div>
-    "
-    .to_string()
-    .html()
-}
 
 fn method_override(method: &Method, query: String) -> Method {
     let vec: Vec<&str> = query.split("_method=").collect();
@@ -59,31 +40,7 @@ async fn main() -> std::io::Result<()> {
                 req.head_mut().method = method_override(&method, query);
                 srv.call(req)
             })
-            .route("/", web::get().to(home))
-            .route(
-                "/books",
-                web::get().to(presentation::book::pages::list::query),
-            )
-            .route(
-                "/books/create",
-                web::get().to(presentation::book::pages::create::query),
-            )
-            .route(
-                "/books/{id}",
-                web::get().to(presentation::book::pages::update::query),
-            )
-            .route(
-                "/books/{id}",
-                web::put().to(presentation::book::pages::update::command),
-            )
-            .route(
-                "/books/{id}",
-                web::delete().to(presentation::book::pages::delete::command),
-            )
-            .route(
-                "/books/create",
-                web::post().to(presentation::book::pages::create::command),
-            )
+            .configure(router::configure)
     })
     .bind((url, port))?
     .run()
