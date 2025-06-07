@@ -1,5 +1,11 @@
 {
+  "rust-analyzer.check.command": "clippy",
+  "rust-analyzer.check.extraArgs": ["--", "-D", "warnings"],
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  },
   "[rust]": {
-    "editor.formatOnSave": true
+    "editor.defaultFormatter": "rust-lang.rust-analyzer"
   }
 }
