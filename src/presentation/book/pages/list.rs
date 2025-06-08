@@ -2,7 +2,6 @@ use actix_web::{HttpResponse, web::Data};
 
 use crate::context::Context;
 use crate::features::book::model::Book;
-use crate::features::book::usecase;
 use crate::presentation::shared::html::{self, HtmlResponse};
 
 fn td(book: &Book) -> String {
@@ -21,8 +20,7 @@ fn td(book: &Book) -> String {
 }
 
 pub async fn query(data: Data<Context>) -> HttpResponse {
-    let repository = data.book.as_ref();
-    let books = usecase::get_books(repository).await;
+    let books = data.book_usecase.get_book();
     let table = html::table(vec!["id", "name", "edit", "delete"], books, td);
     table.html()
 }

@@ -3,7 +3,9 @@ use std::{str::FromStr, sync::Arc};
 use serde::Deserialize;
 use uuid::Uuid;
 
-use crate::features::book::model::{Book, BookId, BookName, BookRepository, DomainResult, DomainError};
+use crate::features::book::model::{
+    Book, BookId, BookName, BookRepository, DomainError, DomainResult,
+};
 
 #[derive(Deserialize)]
 pub struct CreateDto {
@@ -12,6 +14,31 @@ pub struct CreateDto {
 #[derive(Deserialize)]
 pub struct UpdateDto {
     pub name: String,
+}
+
+pub trait BookUsecase: Sync + Send + 'static {
+    fn get_book(&self) -> Vec<Book>;
+    // fn get_books() -> DomainResult<Book>;
+    // fn create_book() -> DomainResult<Book>;
+    // fn update_book() -> DomainResult<Book>;
+    // fn delete_book() -> DomainResult<Book>;
+}
+
+#[derive(Clone)]
+pub struct BookUsecaseImpl {
+    repository: Arc<dyn BookRepository>,
+}
+
+impl BookUsecaseImpl {
+    pub fn new(repository: Arc<dyn BookRepository>) -> Self {
+        Self { repository }
+    }
+}
+
+impl BookUsecase for BookUsecaseImpl {
+    fn get_book(&self) -> Vec<Book> {
+        self.repository.list()
+    }
 }
 
 pub async fn get_books(repository: &dyn BookRepository) -> Vec<Book> {
