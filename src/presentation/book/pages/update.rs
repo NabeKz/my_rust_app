@@ -5,10 +5,7 @@ use actix_web::{
 
 use crate::{
     context::Context,
-    features::book::{
-        model::Book,
-        usecase::{self, UpdateDto},
-    },
+    features::book::{model::Book, usecase::UpdateDto},
     presentation::shared::html::{self, HtmlResponse},
 };
 
@@ -19,7 +16,7 @@ pub fn find_success(item: Book) -> String {
 
 pub async fn query(data: Data<Context>, path: Path<String>) -> HttpResponse {
     let id = path.into_inner();
-    let item = usecase::get_book(data.book.as_ref(), id).await;
+    let item = data.book_usecase.get_book(id);
     let response = match item {
         Result::Ok(item) => find_success(item),
         Result::Err(_) => "ng".to_string(),
@@ -33,7 +30,7 @@ pub async fn command(
     form: Form<UpdateDto>,
 ) -> HttpResponse {
     let id = path.into_inner();
-    let result = usecase::update_book(data.book.as_ref(), id, form.into_inner()).await;
+    let result = data.book_usecase.update_book(id, form.into_inner());
     match result {
         Result::Ok(_) => html::redirect("/books"),
         Result::Err(_) => html::redirect("/books"),

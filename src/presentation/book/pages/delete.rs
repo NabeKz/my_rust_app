@@ -4,7 +4,7 @@ use actix_web::{
     web::{Data, Path},
 };
 
-use crate::{context::Context, features::book::usecase};
+use crate::context::Context;
 
 fn success() -> HttpResponse {
     HttpResponse::SeeOther()
@@ -14,7 +14,7 @@ fn success() -> HttpResponse {
 
 pub async fn command(data: Data<Context>, path: Path<String>) -> HttpResponse {
     let id = path.into_inner();
-    let _ = usecase::delete_book(data.book.clone(), id).await;
+    let _ = data.book_usecase.delete_book(id);
 
     success()
 }

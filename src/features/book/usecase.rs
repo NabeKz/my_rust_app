@@ -17,11 +17,11 @@ pub struct UpdateDto {
 }
 
 pub trait BookUsecase: Sync + Send + 'static {
-    fn get_book(&self) -> Vec<Book>;
-    // fn get_books() -> DomainResult<Book>;
-    // fn create_book() -> DomainResult<Book>;
-    // fn update_book() -> DomainResult<Book>;
-    // fn delete_book() -> DomainResult<Book>;
+    fn get_book(&self, id: String) -> DomainResult<Book>;
+    fn get_books(&self) -> Vec<Book>;
+    fn create_book(&self, dto: CreateDto) -> DomainResult<()>;
+    fn update_book(&self, id: String, dto: UpdateDto) -> DomainResult<()>;
+    fn delete_book(&self, id: String) -> DomainResult<()>;
 }
 
 #[derive(Clone)]
@@ -36,45 +36,33 @@ impl BookUsecaseImpl {
 }
 
 impl BookUsecase for BookUsecaseImpl {
-    fn get_book(&self) -> Vec<Book> {
+    fn get_books(&self) -> Vec<Book> {
         self.repository.list()
     }
-}
-
-pub async fn get_books(repository: &dyn BookRepository) -> Vec<Book> {
-    repository.list()
-}
-
-pub async fn get_book(repo: &dyn BookRepository, id: String) -> DomainResult<Book> {
-    let uuid = Uuid::from_str(&id)
-        .map_err(|_| DomainError::ValidationError(vec!["Invalid UUID format".to_string()]))?;
-    let book_id = BookId::from_uuid(uuid);
-    repo.find(&book_id)
-}
-
-pub async fn create_book(repo: &dyn BookRepository, dto: CreateDto) -> DomainResult<()> {
-    let book_name = BookName::new(dto.name)?;
-    let book = Book::new(book_name);
-    repo.save(book)
-}
-
-pub async fn update_book(
-    repo: &dyn BookRepository,
-    id: String,
-    dto: UpdateDto,
-) -> DomainResult<()> {
-    let uuid = Uuid::from_str(&id)
-        .map_err(|_| DomainError::ValidationError(vec!["Invalid UUID format".to_string()]))?;
-    let book_id = BookId::from_uuid(uuid);
-    let existing_book = repo.find(&book_id)?;
-    let new_name = BookName::new(dto.name)?;
-    let updated_book = existing_book.update_name(new_name);
-    repo.update(updated_book)
-}
-
-pub async fn delete_book(repo: Arc<dyn BookRepository>, id: String) -> DomainResult<()> {
-    let uuid = Uuid::from_str(&id)
-        .map_err(|_| DomainError::ValidationError(vec!["Invalid UUID format".to_string()]))?;
-    let book_id = BookId::from_uuid(uuid);
-    repo.delete(&book_id)
+    fn get_book(&self, id: String) -> DomainResult<Book> {
+        let uuid = Uuid::from_str(&id)
+            .map_err(|_| DomainError::ValidationError(vec!["Invalid UUID format".to_string()]))?;
+        let book_id = BookId::from_uuid(uuid);
+        self.repository.find(&book_id)
+    }
+    fn create_book(&self, dto: CreateDto) -> DomainResult<()> {
+        let book_name = BookName::new(dto.name)?;
+        let book = Book::new(book_name);
+        self.repository.save(book)
+    }
+    fn update_book(&self, id: String, dto: UpdateDto) -> DomainResult<()> {
+        let uuid = Uuid::from_str(&id)
+            .map_err(|_| DomainError::ValidationError(vec!["Invalid UUID format".to_string()]))?;
+        let book_id = BookId::from_uuid(uuid);
+        let existing_book = self.repository.find(&book_id)?;
+        let new_name = BookName::new(dto.name)?;
+        let updated_book = existing_book.update_name(new_name);
+        self.repository.update(updated_book)
+    }
+    fn delete_book(&self, id: String) -> DomainResult<()> {
+        let uuid = Uuid::from_str(&id)
+            .map_err(|_| DomainError::ValidationError(vec!["Invalid UUID format".to_string()]))?;
+        let book_id = BookId::from_uuid(uuid);
+        self.repository.delete(&book_id)
+    }
 }

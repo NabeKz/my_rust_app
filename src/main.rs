@@ -11,8 +11,8 @@ use my_rust_app::{context::Context, router};
 fn method_override(method: &Method, query: String) -> Method {
     let vec: Vec<&str> = query.split("_method=").collect();
     match (method, vec.as_slice()) {
-        (&Method::POST, ["", "DELETE"]) => Method::DELETE,
-        (&Method::POST, ["", "PUT"]) => Method::PUT,
+        (&Method::POST, ["", "Delete"]) => Method::DELETE,
+        (&Method::POST, ["", "Put"]) => Method::PUT,
         _ => method.clone(),
     }
 }

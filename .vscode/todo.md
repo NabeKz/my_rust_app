@@ -12,3 +12,4 @@
 [ ] - implements db adaptor
 [ ] - documentation
 [ ] - return json response
+[ ] - async trait

@@ -6,7 +6,7 @@ use actix_web::{
 
 use crate::{
     context::Context,
-    features::book::usecase::{self, CreateDto},
+    features::book::usecase::CreateDto,
     presentation::shared::html::{HtmlResponse, input, post_form},
 };
 
@@ -21,7 +21,7 @@ fn success() -> HttpResponse {
         .finish()
 }
 pub async fn command(data: Data<Context>, form: Form<CreateDto>) -> HttpResponse {
-    let result = usecase::create_book(data.book.as_ref(), form.into_inner()).await;
+    let result = data.book_usecase.create_book(form.into_inner());
 
     match result {
         Result::Ok(_) => success(),
