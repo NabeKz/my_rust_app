@@ -22,5 +22,13 @@ fn td(book: &Book) -> String {
 pub async fn query(data: Data<Context>) -> HttpResponse {
     let books = data.book_usecase.get_books();
     let table = html::table(vec!["id", "name", "edit", "delete"], books, td);
-    ("<a href=/>back</a>".to_string() + &table).html()
+    let body = r"
+    <div style=display:flex;gap:16px;>
+        <a href=/>back</a>
+        <a href=/books/create>create</a>
+    </div>"
+        .to_string()
+        + &table;
+
+    body.html()
 }

@@ -8,9 +8,6 @@ pub async fn home() -> HttpResponse {
             <li>
                 <a href=books >books</a>
             </li>
-            <li>
-                <a href=books/create >books create</a>
-            </li>
         </ul>
     </div>
     "

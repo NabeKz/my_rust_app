@@ -31,9 +31,9 @@ async fn main() -> std::io::Result<()> {
             .app_data(app_data.clone())
             .wrap(middleware::DefaultHeaders::new().add(ContentType::html()))
             .wrap_fn(|mut req, srv| {
-                let method = req.method().clone();
+                let method = &req.method();
                 let query = req.query_string().to_string();
-                req.head_mut().method = method_override(&method, query);
+                req.head_mut().method = method_override(method, query);
                 srv.call(req)
             })
             .configure(router::configure)
