@@ -1,5 +1,5 @@
-use actix_web::{web, HttpResponse};
 use crate::presentation::{self, shared::html::HtmlResponse};
+use actix_web::{HttpResponse, web};
 
 pub async fn home() -> HttpResponse {
     r"
@@ -10,9 +10,6 @@ pub async fn home() -> HttpResponse {
             </li>
             <li>
                 <a href=books/create >books create</a>
-            </li>
-            <li>
-                <a href=books/delete >books delete</a>
             </li>
         </ul>
     </div>
