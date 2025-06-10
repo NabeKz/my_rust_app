@@ -1,33 +1,16 @@
 pub mod model {
-    use std::future::Future;
+    use async_trait::async_trait;
     use uuid::Uuid;
 
+    #[derive(Clone)]
     pub struct UserId(Uuid);
+    #[derive(Clone)]
     pub struct Username(String);
+
+    #[derive(Clone)]
     pub struct User {
         id: UserId,
         name: Username,
-    }
-
-    pub fn get_users() -> impl Future<Output = Vec<User>> {
-        async { vec![] }
-    }
-
-    pub fn get_user_by_id(id: UserId) -> impl Future<Output = Option<User>> {
-        async move {
-            let _ = id; // id を使用
-            None
-        }
-    }
-
-    // 動作確認用のテスト関数
-    pub async fn test_usage() {
-        let users = get_users().await;
-        println!("Got {} users", users.len());
-
-        let user_id = UserId(uuid::Uuid::new_v4());
-        let user = get_user_by_id(user_id).await;
-        println!("User found: {}", user.is_some());
     }
 
     impl UserId {
@@ -53,6 +36,33 @@ pub mod model {
         }
         pub fn name(&self) -> &Username {
             &self.name
+        }
+    }
+
+    #[async_trait]
+    pub trait UserRepository: Send + Sync + 'static {
+        async fn get_users(&self) -> Vec<User>;
+        async fn get_user(&self, id: UserId) -> Result<User, String>;
+    }
+}
+
+pub mod usecase {}
+pub mod infra {
+    use crate::features::user::model::{User, UserId, UserRepository};
+    use async_trait::async_trait;
+    pub struct UserRepositoryOnMemory {
+        items: Vec<User>,
+    }
+
+    #[async_trait]
+    impl UserRepository for UserRepositoryOnMemory {
+        async fn get_users(&self) -> Vec<User> {
+            self.items.clone()
+        }
+
+        async fn get_user(&self, id: UserId) -> Result<User, String> {
+            let _ = id.value();
+            todo!()
         }
     }
 }
