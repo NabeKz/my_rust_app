@@ -2,6 +2,7 @@ use std::{str::FromStr, sync::Arc};
 
 use async_trait::async_trait;
 use serde::Deserialize;
+use std::result::Result::{Err, Ok};
 use uuid::Uuid;
 
 use crate::features::book::model::{
@@ -21,7 +22,7 @@ pub struct UpdateDto {
 pub trait BookUsecase: Sync + Send + 'static {
     async fn get_book(&self, id: String) -> DomainResult<Book>;
     async fn get_books(&self) -> Vec<Book>;
-    async fn create_book(&self, dto: CreateDto) -> DomainResult<()>;
+    async fn create_book(&self, dto: CreateDto) -> Result<(), String>;
     async fn update_book(&self, id: String, dto: UpdateDto) -> DomainResult<()>;
     async fn delete_book(&self, id: String) -> DomainResult<()>;
 }
@@ -48,10 +49,16 @@ impl BookUsecase for BookUsecaseImpl {
         let book_id = BookId::from_uuid(uuid);
         self.repository.find(&book_id).await
     }
-    async fn create_book(&self, dto: CreateDto) -> DomainResult<()> {
-        let book_name = BookName::new(dto.name)?;
-        let book = Book::new(book_name);
-        self.repository.save(book).await
+    async fn create_book(&self, dto: CreateDto) -> Result<(), String> {
+        let book_name = BookName::new(dto.name);
+        match book_name {
+            Ok(book_name) => {
+                let book = Book::new(book_name);
+                let _ = self.repository.save(book).await;
+                Ok(())
+            }
+            Err(_) => Err("error".to_string()),
+        }
     }
     async fn update_book(&self, id: String, dto: UpdateDto) -> DomainResult<()> {
         let uuid = Uuid::from_str(&id)

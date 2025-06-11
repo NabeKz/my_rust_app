@@ -21,7 +21,8 @@ fn success() -> HttpResponse {
         .finish()
 }
 
-fn failure() -> HttpResponse {
+fn failure(err: String) -> HttpResponse {
+    print!("{}", err);
     HttpResponse::SeeOther()
         .append_header((header::LOCATION, "/books/create"))
         .finish()
@@ -32,6 +33,6 @@ pub async fn command(data: Data<Context>, form: Form<CreateDto>) -> HttpResponse
 
     match result {
         Result::Ok(_) => success(),
-        Result::Err(err) => failure(),
+        Result::Err(err) => failure(err),
     }
 }
