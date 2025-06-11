@@ -16,7 +16,7 @@ pub fn find_success(item: Book) -> String {
 
 pub async fn query(data: Data<Context>, path: Path<String>) -> HttpResponse {
     let id = path.into_inner();
-    let item = data.book_usecase.get_book(id);
+    let item = data.book_usecase.get_book(id).await;
     let response = match item {
         Result::Ok(item) => find_success(item),
         Result::Err(_) => "ng".to_string(),

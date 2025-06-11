@@ -19,7 +19,7 @@ pub struct UpdateDto {
 
 #[async_trait]
 pub trait BookUsecase: Sync + Send + 'static {
-    fn get_book(&self, id: String) -> DomainResult<Book>;
+    async fn get_book(&self, id: String) -> DomainResult<Book>;
     async fn get_books(&self) -> Vec<Book>;
     fn create_book(&self, dto: CreateDto) -> DomainResult<()>;
     fn update_book(&self, id: String, dto: UpdateDto) -> DomainResult<()>;
@@ -42,7 +42,7 @@ impl BookUsecase for BookUsecaseImpl {
     async fn get_books(&self) -> Vec<Book> {
         self.repository.list().await
     }
-    fn get_book(&self, id: String) -> DomainResult<Book> {
+    async fn get_book(&self, id: String) -> DomainResult<Book> {
         let uuid = Uuid::from_str(&id)
             .map_err(|_| DomainError::ValidationError(vec!["Invalid UUID format".to_string()]))?;
         let book_id = BookId::from_uuid(uuid);

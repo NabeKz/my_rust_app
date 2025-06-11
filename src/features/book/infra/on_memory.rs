@@ -1,7 +1,9 @@
-use std::sync::{Arc, Mutex};
 use async_trait::async_trait;
+use std::sync::{Arc, Mutex};
 
-use crate::features::book::model::{Book, BookId, BookName, BookRepository, DomainResult, DomainError};
+use crate::features::book::model::{
+    Book, BookId, BookName, BookRepository, DomainError, DomainResult,
+};
 
 pub struct BookRepositoryOnMemory {
     items: Arc<Mutex<Vec<Book>>>,
@@ -11,7 +13,7 @@ impl Default for BookRepositoryOnMemory {
     fn default() -> Self {
         let items = vec![
             Book::new(BookName::new("Sample Book 1").unwrap()),
-            Book::new(BookName::new("Sample Book 2").unwrap())
+            Book::new(BookName::new("Sample Book 2").unwrap()),
         ];
         Self {
             items: Arc::new(Mutex::new(items)),
