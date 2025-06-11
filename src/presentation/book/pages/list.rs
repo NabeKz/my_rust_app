@@ -20,7 +20,7 @@ fn td(book: &Book) -> String {
 }
 
 pub async fn query(data: Data<Context>) -> HttpResponse {
-    let books = data.book_usecase.get_books();
+    let books = data.book_usecase.get_books().await;
     let table = html::table(vec!["id", "name", "edit", "delete"], books, td);
     let body = r"
     <div style=display:flex;gap:16px;>

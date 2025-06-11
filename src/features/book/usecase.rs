@@ -1,5 +1,6 @@
 use std::{str::FromStr, sync::Arc};
 
+use async_trait::async_trait;
 use serde::Deserialize;
 use uuid::Uuid;
 
@@ -16,9 +17,10 @@ pub struct UpdateDto {
     pub name: String,
 }
 
+#[async_trait]
 pub trait BookUsecase: Sync + Send + 'static {
     fn get_book(&self, id: String) -> DomainResult<Book>;
-    fn get_books(&self) -> Vec<Book>;
+    async fn get_books(&self) -> Vec<Book>;
     fn create_book(&self, dto: CreateDto) -> DomainResult<()>;
     fn update_book(&self, id: String, dto: UpdateDto) -> DomainResult<()>;
     fn delete_book(&self, id: String) -> DomainResult<()>;
@@ -35,9 +37,10 @@ impl BookUsecaseImpl {
     }
 }
 
+#[async_trait]
 impl BookUsecase for BookUsecaseImpl {
-    fn get_books(&self) -> Vec<Book> {
-        self.repository.list()
+    async fn get_books(&self) -> Vec<Book> {
+        self.repository.list().await
     }
     fn get_book(&self, id: String) -> DomainResult<Book> {
         let uuid = Uuid::from_str(&id)

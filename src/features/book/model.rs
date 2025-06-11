@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use std::fmt;
 use uuid::Uuid;
 
@@ -101,9 +102,10 @@ impl Book {
     }
 }
 
+#[async_trait]
 pub trait BookRepository: Sync + Send + 'static {
     fn find(&self, id: &BookId) -> DomainResult<Book>;
-    fn list(&self) -> Vec<Book>;
+    async fn list(&self) -> Vec<Book>;
     fn save(&self, book: Book) -> DomainResult<()>;
     fn update(&self, book: Book) -> DomainResult<()>;
     fn delete(&self, id: &BookId) -> DomainResult<()>;

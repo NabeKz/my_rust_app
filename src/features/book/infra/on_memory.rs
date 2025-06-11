@@ -1,4 +1,5 @@
 use std::sync::{Arc, Mutex};
+use async_trait::async_trait;
 
 use crate::features::book::model::{Book, BookId, BookName, BookRepository, DomainResult, DomainError};
 
@@ -18,8 +19,9 @@ impl Default for BookRepositoryOnMemory {
     }
 }
 
+#[async_trait]
 impl BookRepository for BookRepositoryOnMemory {
-    fn list(&self) -> Vec<Book> {
+    async fn list(&self) -> Vec<Book> {
         self.items.lock().unwrap().clone()
     }
     fn save(&self, item: Book) -> DomainResult<()> {
