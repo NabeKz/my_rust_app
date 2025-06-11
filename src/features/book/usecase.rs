@@ -22,7 +22,7 @@ pub trait BookUsecase: Sync + Send + 'static {
     async fn get_book(&self, id: String) -> DomainResult<Book>;
     async fn get_books(&self) -> Vec<Book>;
     fn create_book(&self, dto: CreateDto) -> DomainResult<()>;
-    fn update_book(&self, id: String, dto: UpdateDto) -> DomainResult<()>;
+    async fn update_book(&self, id: String, dto: UpdateDto) -> DomainResult<()>;
     fn delete_book(&self, id: String) -> DomainResult<()>;
 }
 
@@ -46,18 +46,18 @@ impl BookUsecase for BookUsecaseImpl {
         let uuid = Uuid::from_str(&id)
             .map_err(|_| DomainError::ValidationError(vec!["Invalid UUID format".to_string()]))?;
         let book_id = BookId::from_uuid(uuid);
-        self.repository.find(&book_id)
+        self.repository.find(&book_id).await
     }
     fn create_book(&self, dto: CreateDto) -> DomainResult<()> {
         let book_name = BookName::new(dto.name)?;
         let book = Book::new(book_name);
         self.repository.save(book)
     }
-    fn update_book(&self, id: String, dto: UpdateDto) -> DomainResult<()> {
+    async fn update_book(&self, id: String, dto: UpdateDto) -> DomainResult<()> {
         let uuid = Uuid::from_str(&id)
             .map_err(|_| DomainError::ValidationError(vec!["Invalid UUID format".to_string()]))?;
         let book_id = BookId::from_uuid(uuid);
-        let existing_book = self.repository.find(&book_id)?;
+        let existing_book = self.repository.find(&book_id).await?;
         let new_name = BookName::new(dto.name)?;
         let updated_book = existing_book.update_name(new_name);
         self.repository.update(updated_book)

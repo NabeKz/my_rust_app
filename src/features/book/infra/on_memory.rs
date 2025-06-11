@@ -31,7 +31,7 @@ impl BookRepository for BookRepositoryOnMemory {
         Ok(())
     }
 
-    fn find(&self, id: &BookId) -> DomainResult<Book> {
+    async fn find(&self, id: &BookId) -> DomainResult<Book> {
         let items = self.items.lock().unwrap();
         let item = items.iter().find(|it| it.id() == id);
         match item {

@@ -30,7 +30,7 @@ pub async fn command(
     form: Form<UpdateDto>,
 ) -> HttpResponse {
     let id = path.into_inner();
-    let result = data.book_usecase.update_book(id, form.into_inner());
+    let result = data.book_usecase.update_book(id, form.into_inner()).await;
     match result {
         Result::Ok(_) => html::redirect("/books"),
         Result::Err(_) => html::redirect("/books"),
