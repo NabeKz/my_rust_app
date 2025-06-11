@@ -5,6 +5,11 @@ use actix_web::{
     middleware,
     web::Data,
 };
+use actix_session::{
+    config::PersistentSession,
+    storage::CookieSessionStore,
+    SessionMiddleware,
+};
 
 use my_rust_app::{context::Context, router};
 
@@ -27,9 +32,20 @@ async fn main() -> std::io::Result<()> {
     let app_data = Data::new(app_state);
 
     HttpServer::new(move || {
+        // セッション用の秘密鍵（実際のアプリでは環境変数から読み込むべき）
+        let secret_key = actix_web::cookie::Key::generate();
+        
         App::new()
             .app_data(app_data.clone())
             .wrap(middleware::DefaultHeaders::new().add(ContentType::html()))
+            .wrap(
+                SessionMiddleware::builder(CookieSessionStore::default(), secret_key.clone())
+                    .session_lifecycle(
+                        PersistentSession::default()
+                            .session_ttl(actix_web::cookie::time::Duration::hours(24))
+                    )
+                    .build()
+            )
             .wrap_fn(|mut req, srv| {
                 let method = &req.method();
                 let query = req.query_string().to_string();

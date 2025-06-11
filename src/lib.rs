@@ -4,3 +4,4 @@ pub mod features;
 pub mod context;
 pub mod presentation;
 pub mod router;
+pub mod flash_message;
