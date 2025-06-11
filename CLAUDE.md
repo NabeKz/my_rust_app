@@ -53,3 +53,14 @@ Custom HTML generation system in `presentation/shared.rs` with:
 - Built-in CSS styling
 
 The server runs on localhost:5000 with routes for CRUD operations on books using HTML forms with method override support.
+
+## Code Suggestions Priority
+
+When providing suggestions or recommendations, prioritize **learning value** over implementation cost or simplicity. This is a study/learning project, so choose approaches that:
+
+- Demonstrate important web application patterns and concepts
+- Introduce new technologies or architectural patterns
+- Provide hands-on experience with industry-standard practices
+- Offer deeper understanding of underlying mechanisms
+
+Implementation complexity is not a concern - focus on educational benefit.
