@@ -14,7 +14,7 @@ fn success() -> HttpResponse {
 
 pub async fn command(data: Data<Context>, path: Path<String>) -> HttpResponse {
     let id = path.into_inner();
-    let _ = data.book_usecase.delete_book(id);
+    let _ = data.book_usecase.delete_book(id).await;
 
     success()
 }

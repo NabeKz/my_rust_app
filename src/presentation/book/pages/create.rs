@@ -21,7 +21,7 @@ fn success() -> HttpResponse {
         .finish()
 }
 pub async fn command(data: Data<Context>, form: Form<CreateDto>) -> HttpResponse {
-    let result = data.book_usecase.create_book(form.into_inner());
+    let result = data.book_usecase.create_book(form.into_inner()).await;
 
     match result {
         Result::Ok(_) => success(),

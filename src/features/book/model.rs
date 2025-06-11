@@ -106,7 +106,7 @@ impl Book {
 pub trait BookRepository: Sync + Send + 'static {
     async fn find(&self, id: &BookId) -> DomainResult<Book>;
     async fn list(&self) -> Vec<Book>;
-    fn save(&self, book: Book) -> DomainResult<()>;
-    fn update(&self, book: Book) -> DomainResult<()>;
-    fn delete(&self, id: &BookId) -> DomainResult<()>;
+    async fn save(&self, book: Book) -> DomainResult<()>;
+    async fn update(&self, book: Book) -> DomainResult<()>;
+    async fn delete(&self, id: &BookId) -> DomainResult<()>;
 }

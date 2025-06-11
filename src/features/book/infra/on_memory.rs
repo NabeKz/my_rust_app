@@ -26,7 +26,8 @@ impl BookRepository for BookRepositoryOnMemory {
     async fn list(&self) -> Vec<Book> {
         self.items.lock().unwrap().clone()
     }
-    fn save(&self, item: Book) -> DomainResult<()> {
+
+    async fn save(&self, item: Book) -> DomainResult<()> {
         self.items.lock().unwrap().push(item);
         Ok(())
     }
@@ -40,7 +41,7 @@ impl BookRepository for BookRepositoryOnMemory {
         }
     }
 
-    fn update(&self, book: Book) -> DomainResult<()> {
+    async fn update(&self, book: Book) -> DomainResult<()> {
         let mut items = self.items.lock().unwrap();
         if let Some(pos) = items.iter().position(|it| it.id() == book.id()) {
             items[pos] = book;
@@ -50,7 +51,7 @@ impl BookRepository for BookRepositoryOnMemory {
         }
     }
 
-    fn delete(&self, id: &BookId) -> DomainResult<()> {
+    async fn delete(&self, id: &BookId) -> DomainResult<()> {
         let mut items = self.items.lock().unwrap();
         let initial_len = items.len();
         items.retain(|it| it.id() != id);
