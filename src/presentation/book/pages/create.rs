@@ -20,11 +20,18 @@ fn success() -> HttpResponse {
         .append_header((header::LOCATION, "/books"))
         .finish()
 }
+
+fn failure() -> HttpResponse {
+    HttpResponse::SeeOther()
+        .append_header((header::LOCATION, "/books/create"))
+        .finish()
+}
+
 pub async fn command(data: Data<Context>, form: Form<CreateDto>) -> HttpResponse {
     let result = data.book_usecase.create_book(form.into_inner()).await;
 
     match result {
         Result::Ok(_) => success(),
-        Result::Err(_) => success(),
+        Result::Err(err) => failure(),
     }
 }
