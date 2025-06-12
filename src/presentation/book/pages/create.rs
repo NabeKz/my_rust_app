@@ -3,12 +3,24 @@ use actix_web::{
     http::header,
     web::{Data, Form},
 };
+use serde::Deserialize;
 
 use crate::{
     context::Context,
-    features::book::usecase::CreateDto,
+    features::book::usecase::CreateBookInput,
     presentation::shared::html::{HtmlResponse, input, post_form},
 };
+
+#[derive(Deserialize)]
+pub struct CreateBookRequest {
+    pub name: String,
+}
+
+impl From<CreateBookRequest> for CreateBookInput {
+    fn from(req: CreateBookRequest) -> Self {
+        CreateBookInput { name: req.name }
+    }
+}
 
 pub async fn query(req: HttpRequest) -> HttpResponse {
     let cookie = req.cookie("error");
@@ -35,8 +47,9 @@ fn failure(err: String) -> HttpResponse {
         .finish()
 }
 
-pub async fn command(data: Data<Context>, form: Form<CreateDto>) -> HttpResponse {
-    let result = data.book_usecase.create_book(form.into_inner()).await;
+pub async fn command(data: Data<Context>, form: Form<CreateBookRequest>) -> HttpResponse {
+    let input = form.into_inner().into();
+    let result = data.book_usecase.create_book(input).await;
 
     match result {
         Result::Ok(_) => success(),
