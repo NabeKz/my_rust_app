@@ -44,5 +44,9 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
         .route(
             "/api/books",
             web::get().to(presentation::book::http::response::response),
+        )
+        .route(
+            "/api/books",
+            web::post().to(presentation::book::http::response::post),
         );
 }

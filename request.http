@@ -1,1 +1,10 @@
-curl http://localhost:5000/api/books
+@baseUrl = http://localhost:5000
+###
+GET {{baseUrl}}/api/books
+###
+POST {{baseUrl}}/api/books
+Content-Type: application/json
+
+{
+  "name": "hoge"
+}
