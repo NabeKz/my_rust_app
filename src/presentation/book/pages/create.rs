@@ -17,10 +17,9 @@ pub async fn query(req: HttpRequest) -> HttpResponse {
         None => "".to_string(),
     };
 
-    println!("{}", error);
-
-    let content = input("name", "");
-    post_form("/books/create", content).to_string().html()
+    let body = format!("<div>{}</div>", error);
+    let form = post_form("/books/create", input("name", ""));
+    (body + &form).flush("error")
 }
 
 fn success() -> HttpResponse {
@@ -30,10 +29,9 @@ fn success() -> HttpResponse {
 }
 
 fn failure(err: String) -> HttpResponse {
-    println!("err is {}", err);
     HttpResponse::SeeOther()
         .append_header((header::LOCATION, "/books/create"))
-        .append_header((header::SET_COOKIE, "error=ng!"))
+        .append_header((header::SET_COOKIE, "error=".to_owned() + &err))
         .finish()
 }
 

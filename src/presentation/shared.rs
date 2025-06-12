@@ -13,11 +13,17 @@ pub mod html {
 
     pub trait HtmlResponse {
         fn html(self) -> HttpResponse;
+        fn flush(self, name: &str) -> HttpResponse;
     }
 
     impl HtmlResponse for String {
         fn html(self) -> HttpResponse {
             HttpResponse::Ok().body(STYLE.to_string() + &self)
+        }
+        fn flush(self, name: &str) -> HttpResponse {
+            HttpResponse::Ok()
+                .append_header((header::SET_COOKIE, format!("{}=''; Max-Age=0", name)))
+                .body(STYLE.to_string() + &self)
         }
     }
 
