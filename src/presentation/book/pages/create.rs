@@ -1,5 +1,5 @@
 use actix_web::{
-    HttpResponse,
+    HttpRequest, HttpResponse,
     http::header,
     web::{Data, Form},
 };
@@ -10,7 +10,15 @@ use crate::{
     presentation::shared::html::{HtmlResponse, input, post_form},
 };
 
-pub async fn query() -> HttpResponse {
+pub async fn query(req: HttpRequest) -> HttpResponse {
+    let cookie = req.cookie("error");
+    let error = match cookie {
+        Some(cookie) => cookie.value().to_string(),
+        None => "".to_string(),
+    };
+
+    println!("{}", error);
+
     let content = input("name", "");
     post_form("/books/create", content).to_string().html()
 }
@@ -22,9 +30,10 @@ fn success() -> HttpResponse {
 }
 
 fn failure(err: String) -> HttpResponse {
-    print!("{}", err);
+    println!("err is {}", err);
     HttpResponse::SeeOther()
         .append_header((header::LOCATION, "/books/create"))
+        .append_header((header::SET_COOKIE, "error=ng!"))
         .finish()
 }
 
