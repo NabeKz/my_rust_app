@@ -40,13 +40,16 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
         .route(
             "/books/create",
             web::post().to(presentation::book::pages::create::command),
-        )
-        .route(
-            "/api/books",
-            web::get().to(presentation::book::http::response::response),
-        )
-        .route(
-            "/api/books",
-            web::post().to(presentation::book::http::response::post),
         );
+}
+
+pub fn api_route(cfg: &mut web::ServiceConfig) {
+    cfg.route(
+        "/books",
+        web::get().to(presentation::book::http::response::response),
+    )
+    .route(
+        "/books",
+        web::post().to(presentation::book::http::response::post),
+    );
 }

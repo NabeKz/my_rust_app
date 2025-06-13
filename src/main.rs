@@ -3,7 +3,7 @@ use actix_web::{
     dev::Service,
     http::{Method, header::ContentType},
     middleware,
-    web::Data,
+    web::{self, Data},
 };
 
 use my_rust_app::{context::Context, router};
@@ -37,6 +37,7 @@ async fn main() -> std::io::Result<()> {
                 srv.call(req)
             })
             .configure(router::configure)
+            .service(web::scope("api").configure(router::api_route))
     })
     .bind((url, port))?
     .run()
