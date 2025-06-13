@@ -49,6 +49,7 @@ pub async fn post(data: Data<Context>, json: Json<CreateBookApiRequest>) -> Http
         Result::Err(_) => HttpResponse::BadRequest().json(()),
     }
 }
+
 pub async fn put(
     data: Data<Context>,
     path: Path<String>,
@@ -57,6 +58,16 @@ pub async fn put(
     let id = path.into_inner();
     let input = json.into_inner().into();
     let result = data.book_usecase.update_book(id, input).await;
+
+    match result {
+        Result::Ok(_) => HttpResponse::Ok().json(()),
+        Result::Err(_) => HttpResponse::BadRequest().json(()),
+    }
+}
+
+pub async fn delete(data: Data<Context>, path: Path<String>) -> HttpResponse {
+    let id = path.into_inner();
+    let result = data.book_usecase.delete_book(id).await;
 
     match result {
         Result::Ok(_) => HttpResponse::Ok().json(()),
