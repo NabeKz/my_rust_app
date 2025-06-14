@@ -19,27 +19,27 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.route("/", web::get().to(home))
         .route(
             "/books",
-            web::get().to(presentation::book::pages::list::query),
+            web::get().to(presentation::book::pages::query::list),
         )
         .route(
             "/books/create",
-            web::get().to(presentation::book::pages::create::query),
+            web::get().to(presentation::book::pages::query::create),
         )
         .route(
             "/books/{id}",
-            web::get().to(presentation::book::pages::update::query),
-        )
-        .route(
-            "/books/{id}",
-            web::put().to(presentation::book::pages::update::command),
-        )
-        .route(
-            "/books/{id}",
-            web::delete().to(presentation::book::pages::delete::command),
+            web::get().to(presentation::book::pages::query::edit),
         )
         .route(
             "/books/create",
-            web::post().to(presentation::book::pages::create::command),
+            web::post().to(presentation::book::pages::command::create),
+        )
+        .route(
+            "/books/{id}",
+            web::put().to(presentation::book::pages::command::update),
+        )
+        .route(
+            "/books/{id}",
+            web::delete().to(presentation::book::pages::command::delete),
         );
 }
 

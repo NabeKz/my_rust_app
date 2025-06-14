@@ -21,7 +21,7 @@ fn td(book: &Book) -> String {
     )
 }
 
-pub async fn read(data: Data<Context>) -> HttpResponse {
+pub async fn list(data: Data<Context>) -> HttpResponse {
     let books = data.book_usecase.get_books().await;
     let table = html::table(vec!["id", "name", "edit", "delete"], books, td);
     let body = r"
@@ -47,7 +47,7 @@ pub async fn create(req: HttpRequest) -> HttpResponse {
     (body + &form).flush("error")
 }
 
-pub async fn update(data: Data<Context>, path: Path<String>) -> HttpResponse {
+pub async fn edit(data: Data<Context>, path: Path<String>) -> HttpResponse {
     let id = path.into_inner();
     let item = data.book_usecase.get_book(id).await;
     let response = match item {
