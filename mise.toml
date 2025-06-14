@@ -12,4 +12,4 @@ run = "cargo fix --allow-dirty"
 run = "cargo clippy -- -D warnings"
 
 [task.check_db]
-run = "DATABASE_URL=sqlite:./my_database.db cargo build"
+run = "cargo sqlx prepare"
