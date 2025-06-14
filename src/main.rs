@@ -5,6 +5,7 @@ use actix_web::{
     middleware,
     web::Data,
 };
+use sqlx::{SqlitePool, sqlite::SqlitePoolOptions};
 
 use my_rust_app::{context::Context, router};
 
@@ -17,13 +18,28 @@ fn method_override(method: &Method, query: String) -> Method {
     }
 }
 
+async fn setup_database() -> Result<SqlitePool, sqlx::Error> {
+    let database_url = "sqlite:./database.sqlite3";
+    let pool = SqlitePoolOptions::new()
+        .max_connections(5)
+        .connect(database_url)
+        .await?;
+
+    // Run migrations
+    sqlx::migrate!("./migrations").run(&pool).await?;
+
+    Ok(pool)
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let url = "localhost";
     let port = 5000;
     println!("running on http://{}:{}", url, port);
 
-    let app_state = Context::init();
+    // Setup database
+    let pool = setup_database().await.expect("Failed to setup database");
+    let app_state = Context::init_with_db(pool);
     let app_data = Data::new(app_state);
 
     HttpServer::new(move || {
