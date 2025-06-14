@@ -10,3 +10,6 @@ run = "cargo fix --allow-dirty"
 
 [tasks.lint]
 run = "cargo clippy -- -D warnings"
+
+[task.check_db]
+run = "DATABASE_URL=sqlite:./my_database.db cargo build"

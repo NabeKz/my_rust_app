@@ -1,8 +1,8 @@
 use async_trait::async_trait;
-use sqlx::{Row, SqlitePool};
+use sqlx::SqlitePool;
 use uuid::Uuid;
 
-use crate::features::book::model::{Book, BookId, BookName, BookRepository, DomainResult};
+use crate::features::book::model::{Book, BookId, BookName, BookRepository, DomainResult, DomainError};
 
 pub struct SqliteBookRepository {
     pool: SqlitePool,
@@ -21,19 +21,22 @@ impl BookRepository for SqliteBookRepository {
     }
 
     async fn list(&self) -> Vec<Book> {
-        let rows = sqlx::query("SELECT id, name FROM books ORDER BY created_at DESC")
+        let rows = match sqlx::query!("SELECT id, name FROM books ORDER BY created_at DESC")
             .fetch_all(&self.pool)
             .await
-            .unwrap_or_default();
+        {
+            Ok(rows) => rows,
+            Err(err) => {
+                eprintln!("Database error in list: {}", err);
+                return Vec::new();
+            }
+        };
 
         rows.into_iter()
             .filter_map(|row| {
-                let id_str: String = row.get("id");
-                let name_str: String = row.get("name");
-
-                let uuid = Uuid::parse_str(&id_str).ok()?;
+                let uuid = Uuid::parse_str(&row.id).ok()?;
                 let book_id = BookId::from_uuid(uuid);
-                let book_name = BookName::new(name_str).ok()?;
+                let book_name = BookName::new(row.name).ok()?;
 
                 Some(Book::from_parts(book_id, book_name))
             })

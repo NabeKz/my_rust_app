@@ -13,6 +13,7 @@ pub enum DomainError {
     InvalidBookName(String),
     BookNotFound(BookId),
     ValidationError(Vec<String>),
+    DatabaseError(String),
 }
 
 impl fmt::Display for DomainError {
@@ -21,6 +22,7 @@ impl fmt::Display for DomainError {
             DomainError::InvalidBookName(msg) => write!(f, "Invalid book name: {}", msg),
             DomainError::BookNotFound(id) => write!(f, "Book not found: {:?}", id),
             DomainError::ValidationError(errors) => write!(f, "Validation errors: {:?}", errors),
+            DomainError::DatabaseError(msg) => write!(f, "Database error: {}", msg),
         }
     }
 }
