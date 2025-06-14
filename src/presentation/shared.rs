@@ -68,8 +68,8 @@ pub mod html {
     pub fn post_form(action: &str, content: String) -> String {
         form(Method::Post, action, content)
     }
-    pub fn put_form(action: &str, content: String) -> String {
-        form(Method::Put, action, content)
+    pub fn put_form<S: Into<String>>(action: S, content: String) -> String {
+        form(Method::Put, &action.into(), content)
     }
     pub fn delete_form(action: String, content: &str) -> String {
         form(Method::Delete, &action, content.to_string())
