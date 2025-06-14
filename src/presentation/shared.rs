@@ -128,4 +128,10 @@ pub mod html {
             .append_header((header::LOCATION, to))
             .finish()
     }
+    pub fn redirect_with_error<S: Into<String>>(to: &str, error: S) -> HttpResponse {
+        HttpResponse::SeeOther()
+            .append_header((header::LOCATION, to))
+            .append_header((header::SET_COOKIE, String::from("error=") + &error.into()))
+            .finish()
+    }
 }

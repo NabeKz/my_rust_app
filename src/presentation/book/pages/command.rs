@@ -1,34 +1,63 @@
-use actix_web::{HttpResponse, web::Data};
+use actix_web::{
+    HttpResponse,
+    web::{Data, Form, Path},
+};
+use serde::Deserialize;
 
-use crate::context::Context;
-use crate::features::book::model::Book;
-use crate::presentation::shared::html::{self, HtmlResponse};
+use crate::{
+    context::Context,
+    features::book::usecase::{CreateBookInput, UpdateBookInput},
+    presentation::shared::html::{redirect, redirect_with_error},
+};
 
-fn td(book: &Book) -> String {
-    format!(
-        "
-        <td>{}</td>
-        <td>{}</td>
-        <td>{}</td>
-        <td>{}</td>
-        ",
-        book.id().value(),
-        book.name().value(),
-        html::link(format!("/books/{}", book.id().value()), "edit".to_string()),
-        html::delete_form(format!("/books/{}", book.id().value()), "")
-    )
+#[derive(Deserialize)]
+pub struct CreateBookRequest {
+    pub name: String,
+}
+#[derive(Deserialize)]
+pub struct UpdateBookRequest {
+    pub name: String,
 }
 
-pub async fn query(data: Data<Context>) -> HttpResponse {
-    let books = data.book_usecase.get_books().await;
-    let table = html::table(vec!["id", "name", "edit", "delete"], books, td);
-    let body = r"
-    <div style=display:flex;gap:16px;>
-        <a href=/>back</a>
-        <a href=/books/create>create</a>
-    </div>"
-        .to_string()
-        + &table;
+impl From<CreateBookRequest> for CreateBookInput {
+    fn from(req: CreateBookRequest) -> Self {
+        CreateBookInput { name: req.name }
+    }
+}
 
-    body.html()
+impl From<UpdateBookRequest> for UpdateBookInput {
+    fn from(req: UpdateBookRequest) -> Self {
+        UpdateBookInput { name: req.name }
+    }
+}
+
+pub async fn create(data: Data<Context>, form: Form<CreateBookRequest>) -> HttpResponse {
+    let input = form.into_inner().into();
+    let result = data.book_usecase.create_book(input).await;
+
+    match result {
+        Result::Ok(_) => redirect("/books"),
+        Result::Err(err) => redirect_with_error("/books", err),
+    }
+}
+
+pub async fn update(
+    data: Data<Context>,
+    path: Path<String>,
+    form: Form<UpdateBookRequest>,
+) -> HttpResponse {
+    let id = path.into_inner();
+    let input = form.into_inner().into();
+    let result = data.book_usecase.update_book(id, input).await;
+    match result {
+        Result::Ok(_) => redirect("/books"),
+        Result::Err(_) => redirect("/books"),
+    }
+}
+
+pub async fn delete(data: Data<Context>, path: Path<String>) -> HttpResponse {
+    let id = path.into_inner();
+    let _ = data.book_usecase.delete_book(id).await;
+
+    redirect("/books")
 }
