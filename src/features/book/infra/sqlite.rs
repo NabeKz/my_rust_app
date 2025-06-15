@@ -95,7 +95,7 @@ impl BookRepository for SqliteBookRepository {
         let updated_at = book.created_at();
 
         sqlx::query!(
-            "INSERT INTO books (id, name, created_at, updated_at) VALUES ($1, $2, $3, $4OR)",
+            "INSERT INTO books (id, name, created_at, updated_at) VALUES ($1, $2, $3, $4)",
             id,
             name,
             created_at,
