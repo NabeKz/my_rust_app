@@ -95,7 +95,7 @@ impl BookRepository for SqliteBookRepository {
         let updated_at = book.created_at();
 
         sqlx::query!(
-            "INSERT INTO books (id, name, created_at, updated_at) VALUES (?, ?, ?, ?)",
+            "INSERT INTO books (id, name, created_at, updated_at) VALUES ($1, $2, $3, $4OR)",
             id,
             name,
             created_at,
@@ -108,8 +108,16 @@ impl BookRepository for SqliteBookRepository {
         Ok(())
     }
 
-    async fn update(&self, _book: Book) -> DomainResult<()> {
-        todo!()
+    async fn update(&self, book: Book) -> DomainResult<()> {
+        let id = book.id().value().to_string();
+        let name = book.name().value().to_string();
+
+        sqlx::query!("UPDATE books SET name = $1 WHERE id = $2", name, id)
+            .execute(&self.pool)
+            .await
+            .map_err(|err| DomainError::DatabaseError(format!("Failed to update book: {}", err)))?;
+
+        Ok(())
     }
 
     async fn delete(&self, id: &BookId) -> DomainResult<()> {
