@@ -18,9 +18,13 @@ impl TryFrom<BookRow> for Book {
     type Error = DomainError;
 
     fn try_from(row: BookRow) -> Result<Self, Self::Error> {
-        let id_str = row.id.ok_or_else(|| DomainError::DatabaseError("Missing id".into()))?;
-        let name_str = row.name.ok_or_else(|| DomainError::DatabaseError("Missing name".into()))?;
-        
+        let id_str = row
+            .id
+            .ok_or_else(|| DomainError::DatabaseError("Missing id".into()))?;
+        let name_str = row
+            .name
+            .ok_or_else(|| DomainError::DatabaseError("Missing name".into()))?;
+
         let uuid = Uuid::parse_str(&id_str)
             .map_err(|_| DomainError::DatabaseError("Invalid UUID format".into()))?;
         let book_id = BookId::from_uuid(uuid);
@@ -65,8 +69,21 @@ impl BookRepository for SqliteBookRepository {
             .collect()
     }
 
-    async fn save(&self, _book: Book) -> DomainResult<()> {
-        todo!()
+    async fn save(&self, book: Book) -> DomainResult<()> {
+        let now = Utc::now().naive_utc();
+        
+        sqlx::query(
+            "INSERT INTO books (id, name, created_at, updated_at) VALUES (?, ?, ?, ?)"
+        )
+        .bind(book.id().value().to_string())
+        .bind(book.name().value())
+        .bind(now)
+        .bind(now)
+        .execute(&self.pool)
+        .await
+        .map_err(|err| DomainError::DatabaseError(format!("Failed to save book: {}", err)))?;
+        
+        Ok(())
     }
 
     async fn update(&self, _book: Book) -> DomainResult<()> {

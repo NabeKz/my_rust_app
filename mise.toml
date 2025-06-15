@@ -13,3 +13,6 @@ run = "cargo fix --allow-dirty"
 
 [tasks.lint]
 run = "cargo clippy -- -D warnings"
+
+[tasks.migrate]
+run = "sqlx migrate run"
