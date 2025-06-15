@@ -1,3 +1,6 @@
+[env]
+mise.file = ".env"
+
 [tasks.serve]
 run = """
   watchexec --restart --clear --wrap-process=session --stop-signal \
@@ -10,6 +13,3 @@ run = "cargo fix --allow-dirty"
 
 [tasks.lint]
 run = "cargo clippy -- -D warnings"
-
-[task.check_db]
-run = "cargo sqlx prepare"

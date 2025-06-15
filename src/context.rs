@@ -1,5 +1,5 @@
-use std::sync::Arc;
 use sqlx::SqlitePool;
+use std::sync::Arc;
 
 use crate::features::book::infra::{on_memory, sqlite};
 use crate::features::book::usecase::{BookUsecase, BookUsecaseImpl};
