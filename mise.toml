@@ -14,5 +14,8 @@ run = "cargo fix --allow-dirty"
 [tasks.lint]
 run = "cargo clippy -- -D warnings"
 
+[tasks.db_reset]
+run = "sqlx database drop -y && sqlx database create"
+
 [tasks.migrate]
 run = "sqlx migrate run"

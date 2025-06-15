@@ -7,7 +7,7 @@ use crate::features::book::model::{
     Book, BookId, BookName, BookRepository, DomainError, DomainResult,
 };
 
-#[derive(FromRow)]
+#[derive(FromRow, Debug)]
 struct BookRow {
     id: Option<String>,
     name: Option<String>,
@@ -71,18 +71,16 @@ impl BookRepository for SqliteBookRepository {
 
     async fn save(&self, book: Book) -> DomainResult<()> {
         let now = Utc::now().naive_utc();
-        
-        sqlx::query(
-            "INSERT INTO books (id, name, created_at, updated_at) VALUES (?, ?, ?, ?)"
-        )
-        .bind(book.id().value().to_string())
-        .bind(book.name().value())
-        .bind(now)
-        .bind(now)
-        .execute(&self.pool)
-        .await
-        .map_err(|err| DomainError::DatabaseError(format!("Failed to save book: {}", err)))?;
-        
+
+        sqlx::query("INSERT INTO books (id, name, created_at, updated_at) VALUES (?, ?, ?, ?)")
+            .bind(book.id().value().to_string())
+            .bind(book.name().value())
+            .bind(now)
+            .bind(now)
+            .execute(&self.pool)
+            .await
+            .map_err(|err| DomainError::DatabaseError(format!("Failed to save book: {}", err)))?;
+
         Ok(())
     }
 
