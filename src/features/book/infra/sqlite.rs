@@ -92,7 +92,7 @@ impl BookRepository for SqliteBookRepository {
         let id = book.id().value().to_string();
         let name = book.name().value();
         let created_at = book.created_at();
-        let updated_at = book.updated_at();
+        let updated_at = book.created_at();
 
         sqlx::query!(
             "INSERT INTO books (id, name, created_at, updated_at) VALUES (?, ?, ?, ?)",
@@ -112,7 +112,13 @@ impl BookRepository for SqliteBookRepository {
         todo!()
     }
 
-    async fn delete(&self, _id: &BookId) -> DomainResult<()> {
-        todo!()
+    async fn delete(&self, id: &BookId) -> DomainResult<()> {
+        let id = id.value().to_string();
+        sqlx::query!("DELETE FROM books WHERE id = ?", id)
+            .execute(&self.pool)
+            .await
+            .map_err(|err| DomainError::DatabaseError(format!("Failed to delete book: {}", err)))?;
+
+        Ok(())
     }
 }
