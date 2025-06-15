@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use chrono::{NaiveDateTime, Utc};
 use std::fmt;
 use uuid::Uuid;
 
@@ -74,6 +75,7 @@ impl Default for BookId {
 pub struct Book {
     id: BookId,
     name: BookName,
+    created_at: NaiveDateTime,
 }
 
 impl Book {
@@ -81,11 +83,16 @@ impl Book {
         Self {
             id: BookId::new(),
             name,
+            created_at: Utc::now().naive_utc(),
         }
     }
 
-    pub fn from_parts(id: BookId, name: BookName) -> Self {
-        Self { id, name }
+    pub fn from_parts(id: BookId, name: BookName, created_at: NaiveDateTime) -> Self {
+        Self {
+            id,
+            name,
+            created_at,
+        }
     }
 
     pub fn id(&self) -> &BookId {
@@ -95,11 +102,14 @@ impl Book {
     pub fn name(&self) -> &BookName {
         &self.name
     }
+    pub fn created_at(&self) -> &NaiveDateTime {
+        &self.created_at
+    }
 
     pub fn update_name(&self, new_name: BookName) -> Self {
         Self {
-            id: self.id.clone(),
             name: new_name,
+            ..self.clone()
         }
     }
 }

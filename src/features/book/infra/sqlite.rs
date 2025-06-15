@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use chrono::{NaiveDateTime, Utc};
+use chrono::NaiveDateTime;
 use sqlx::{FromRow, SqlitePool};
 use uuid::Uuid;
 
@@ -32,13 +32,23 @@ impl BookRow {
             .ok_or_else(|| DomainError::DatabaseError("Missing name".into()))?;
         BookName::new(name_str.clone())
     }
+    fn get_created_at(&self) -> DomainResult<NaiveDateTime> {
+        let created_at = self
+            .created_at
+            .ok_or_else(|| DomainError::DatabaseError("Missing name".into()))?;
+        Ok(created_at)
+    }
 }
 
 impl TryFrom<BookRow> for Book {
     type Error = DomainError;
 
     fn try_from(row: BookRow) -> Result<Self, Self::Error> {
-        Ok(Book::from_parts(row.get_id()?, row.get_name()?))
+        Ok(Book::from_parts(
+            row.get_id()?,
+            row.get_name()?,
+            row.get_created_at()?,
+        ))
     }
 }
 
@@ -79,13 +89,11 @@ impl BookRepository for SqliteBookRepository {
     }
 
     async fn save(&self, book: Book) -> DomainResult<()> {
-        let now = Utc::now().naive_utc();
-
         sqlx::query("INSERT INTO books (id, name, created_at, updated_at) VALUES (?, ?, ?, ?)")
             .bind(book.id().value().to_string())
             .bind(book.name().value())
-            .bind(now)
-            .bind(now)
+            .bind(book.created_at())
+            .bind(book.created_at())
             .execute(&self.pool)
             .await
             .map_err(|err| DomainError::DatabaseError(format!("Failed to save book: {}", err)))?;
