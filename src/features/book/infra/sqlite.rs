@@ -89,14 +89,21 @@ impl BookRepository for SqliteBookRepository {
     }
 
     async fn save(&self, book: Book) -> DomainResult<()> {
-        sqlx::query("INSERT INTO books (id, name, created_at, updated_at) VALUES (?, ?, ?, ?)")
-            .bind(book.id().value().to_string())
-            .bind(book.name().value())
-            .bind(book.created_at())
-            .bind(book.created_at())
-            .execute(&self.pool)
-            .await
-            .map_err(|err| DomainError::DatabaseError(format!("Failed to save book: {}", err)))?;
+        let id = book.id().value().to_string();
+        let name = book.name().value();
+        let created_at = book.created_at();
+        let updated_at = book.updated_at();
+
+        sqlx::query!(
+            "INSERT INTO books (id, name, created_at, updated_at) VALUES (?, ?, ?, ?)",
+            id,
+            name,
+            created_at,
+            updated_at
+        )
+        .execute(&self.pool)
+        .await
+        .map_err(|err| DomainError::DatabaseError(format!("Failed to save book: {}", err)))?;
 
         Ok(())
     }
