@@ -14,22 +14,31 @@ struct BookRow {
     created_at: Option<NaiveDateTime>,
 }
 
+impl BookRow {
+    fn get_id(&self) -> DomainResult<BookId> {
+        let id_str = self
+            .id
+            .as_ref()
+            .ok_or_else(|| DomainError::DatabaseError("Missing id".into()))?;
+        let uuid = Uuid::parse_str(id_str)
+            .map_err(|_| DomainError::DatabaseError("Invalid UUID format".into()))?;
+        Ok(BookId::from_uuid(uuid))
+    }
+
+    fn get_name(&self) -> DomainResult<BookName> {
+        let name_str = self
+            .name
+            .as_ref()
+            .ok_or_else(|| DomainError::DatabaseError("Missing name".into()))?;
+        BookName::new(name_str.clone())
+    }
+}
+
 impl TryFrom<BookRow> for Book {
     type Error = DomainError;
 
     fn try_from(row: BookRow) -> Result<Self, Self::Error> {
-        let id_str = row
-            .id
-            .ok_or_else(|| DomainError::DatabaseError("Missing id".into()))?;
-        let name_str = row
-            .name
-            .ok_or_else(|| DomainError::DatabaseError("Missing name".into()))?;
-
-        let uuid = Uuid::parse_str(&id_str)
-            .map_err(|_| DomainError::DatabaseError("Invalid UUID format".into()))?;
-        let book_id = BookId::from_uuid(uuid);
-        let book_name = BookName::new(name_str)?;
-        Ok(Book::from_parts(book_id, book_name))
+        Ok(Book::from_parts(row.get_id()?, row.get_name()?))
     }
 }
 
