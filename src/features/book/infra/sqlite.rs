@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use anyhow::Context;
 use chrono::NaiveDateTime;
 use sqlx::{FromRow, SqlitePool};
 use uuid::Uuid;
@@ -7,12 +8,14 @@ use crate::features::book::model::{
     Book, BookId, BookName, BookRepository, DomainError, DomainResult,
 };
 
-// sqlx::Errorからの自動変換
+// sqlx::Errorからの詳細コンテキスト付き変換
 impl From<sqlx::Error> for DomainError {
     fn from(err: sqlx::Error) -> Self {
-        DomainError::RepositoryError {
-            message: err.to_string(),
-        }
+        let detailed_error = anyhow::Error::from(err)
+            .context("SQLite database operation failed")
+            .context("Repository layer error occurred");
+        
+        DomainError::RepositoryError(detailed_error)
     }
 }
 
@@ -28,11 +31,11 @@ impl BookRow {
         let id_str = self
             .id
             .as_ref()
-            .ok_or_else(|| DomainError::RepositoryError {
+            .ok_or_else(|| DomainError::DataConversionError {
                 message: "Missing id".to_string(),
             })?;
         let uuid = Uuid::parse_str(id_str)
-            .map_err(|_| DomainError::RepositoryError {
+            .map_err(|_| DomainError::DataConversionError {
                 message: "Invalid UUID format".to_string(),
             })?;
         Ok(BookId::from_uuid(uuid))
@@ -42,7 +45,7 @@ impl BookRow {
         let name_str = self
             .name
             .as_ref()
-            .ok_or_else(|| DomainError::RepositoryError {
+            .ok_or_else(|| DomainError::DataConversionError {
                 message: "Missing name".to_string(),
             })?;
         BookName::new(name_str.clone())
@@ -50,7 +53,7 @@ impl BookRow {
     fn get_created_at(&self) -> DomainResult<NaiveDateTime> {
         let created_at = self
             .created_at
-            .ok_or_else(|| DomainError::RepositoryError {
+            .ok_or_else(|| DomainError::DataConversionError {
                 message: "Missing created_at".to_string(),
             })?;
         Ok(created_at)
@@ -82,15 +85,16 @@ impl SqliteBookRepository {
 #[async_trait]
 impl BookRepository for SqliteBookRepository {
     async fn find(&self, id: &BookId) -> DomainResult<Book> {
-        let id = id.value().to_string();
+        let id_str = id.value().to_string();
         let row = sqlx::query_as!(
             BookRow,
             "SELECT id, name, created_at FROM books WHERE id = ?",
-            id
+            id_str
         )
         .fetch_one(&self.pool)
         .await
-        .map_err(DomainError::from)?;
+        .with_context(|| format!("Failed to find book with ID: {}", id_str))
+        .map_err(|err| DomainError::RepositoryError(err))?;
 
         Book::try_from(row)
     }
@@ -130,7 +134,8 @@ impl BookRepository for SqliteBookRepository {
         )
         .execute(&self.pool)
         .await
-        .map_err(DomainError::from)?;
+        .with_context(|| format!("Failed to save book with ID: {}", id))
+        .map_err(|err| DomainError::RepositoryError(err))?;
 
         Ok(())
     }
@@ -142,17 +147,19 @@ impl BookRepository for SqliteBookRepository {
         sqlx::query!("UPDATE books SET name = $1 WHERE id = $2", name, id)
             .execute(&self.pool)
             .await
-            .map_err(DomainError::from)?;
+            .with_context(|| format!("Failed to update book with ID: {}", id))
+            .map_err(|err| DomainError::RepositoryError(err))?;
 
         Ok(())
     }
 
     async fn delete(&self, id: &BookId) -> DomainResult<()> {
-        let id = id.value().to_string();
-        sqlx::query!("DELETE FROM books WHERE id = ?", id)
+        let id_str = id.value().to_string();
+        sqlx::query!("DELETE FROM books WHERE id = ?", id_str)
             .execute(&self.pool)
             .await
-            .map_err(DomainError::from)?;
+            .with_context(|| format!("Failed to delete book with ID: {}", id_str))
+            .map_err(|err| DomainError::RepositoryError(err))?;
 
         Ok(())
     }

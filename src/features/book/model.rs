@@ -20,8 +20,11 @@ pub enum DomainError {
     #[error("Validation failed: {errors:?}")]
     ValidationError { errors: Vec<String> },
     
-    #[error("Repository operation failed: {message}")]
-    RepositoryError { message: String },
+    #[error("Data conversion failed: {message}")]
+    DataConversionError { message: String },
+    
+    #[error("Repository operation failed")]
+    RepositoryError(#[source] anyhow::Error),
 }
 
 pub type DomainResult<T> = Result<T, DomainError>;
