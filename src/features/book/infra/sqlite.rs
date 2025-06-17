@@ -64,8 +64,24 @@ impl SqliteBookRepository {
 
 #[async_trait]
 impl BookRepository for SqliteBookRepository {
-    async fn find(&self, _id: &BookId) -> DomainResult<Book> {
-        todo!()
+    async fn find(&self, id: &BookId) -> DomainResult<Book> {
+        let id = id.value().to_string();
+        let row = sqlx::query_as!(
+            BookRow,
+            "SELECT id, name, created_at FROM books WHERE id = ?",
+            id
+        )
+        .fetch_one(&self.pool)
+        .await
+        .map_err(|err| DomainError::DatabaseError(format!("Failed to find book: {}", err)))?;
+
+        match Book::try_from(row) {
+            Ok(row) => Ok(row),
+            Err(err) => Err(DomainError::DatabaseError(format!(
+                "Failed restore row: {}",
+                err
+            ))),
+        }
     }
 
     async fn list(&self) -> Vec<Book> {
