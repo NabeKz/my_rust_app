@@ -121,3 +121,51 @@ pub trait BookRepository: Sync + Send + 'static {
     async fn update(&self, book: Book) -> DomainResult<()>;
     async fn delete(&self, id: &BookId) -> DomainResult<()>;
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use proptest::prelude::*;
+
+    proptest! {
+        #[test]
+        fn prop_book_name_valid_creation(name in "[a-zA-Z0-9 ]{1,255}") {
+            let result = BookName::new(&name);
+            prop_assert!(result.is_ok());
+            if let Ok(book_name) = result {
+                prop_assert_eq!(book_name.value(), name.trim());
+            }
+        }
+
+        #[test]
+        fn prop_book_name_empty_fails(whitespace in "[ \t\n\r]*") {
+            let result = BookName::new(&whitespace);
+            prop_assert!(result.is_err());
+        }
+
+        #[test]
+        fn prop_book_name_too_long_fails(name in "[a-zA-Z0-9]{256,1000}") {
+            let result = BookName::new(&name);
+            prop_assert!(result.is_err());
+        }
+
+        #[test]
+        fn prop_book_update_preserves_id_and_created_at(
+            original_name in "[a-zA-Z0-9 ]{1,255}",
+            new_name in "[a-zA-Z0-9 ]{1,255}"
+        ) {
+            let original_book_name = BookName::new(&original_name).unwrap();
+            let new_book_name = BookName::new(&new_name).unwrap();
+            
+            let book = Book::new(original_book_name);
+            let original_id = book.id().value();
+            let original_created_at = *book.created_at();
+            
+            let updated_book = book.update_name(new_book_name.clone());
+            
+            prop_assert_eq!(updated_book.id().value(), original_id);
+            prop_assert_eq!(updated_book.created_at(), &original_created_at);
+            prop_assert_eq!(updated_book.name().value(), new_book_name.value());
+        }
+    }
+}
