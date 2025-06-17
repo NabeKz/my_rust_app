@@ -37,7 +37,9 @@ impl BookRepository for BookRepositoryOnMemory {
         let item = items.iter().find(|it| it.id() == id);
         match item {
             Some(book) => Ok(book.clone()),
-            None => Err(DomainError::BookNotFound(id.clone())),
+            None => Err(DomainError::BookNotFound {
+                id: id.value().to_string(),
+            }),
         }
     }
 
@@ -47,7 +49,9 @@ impl BookRepository for BookRepositoryOnMemory {
             items[pos] = book;
             Ok(())
         } else {
-            Err(DomainError::BookNotFound(book.id().clone()))
+            Err(DomainError::BookNotFound {
+                id: book.id().value().to_string(),
+            })
         }
     }
 
@@ -58,7 +62,9 @@ impl BookRepository for BookRepositoryOnMemory {
         if items.len() < initial_len {
             Ok(())
         } else {
-            Err(DomainError::BookNotFound(id.clone()))
+            Err(DomainError::BookNotFound {
+                id: id.value().to_string(),
+            })
         }
     }
 }

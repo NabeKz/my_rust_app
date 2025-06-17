@@ -43,7 +43,9 @@ impl BookUsecase for BookUsecaseImpl {
     }
     async fn get_book(&self, id: String) -> DomainResult<Book> {
         let uuid = Uuid::from_str(&id)
-            .map_err(|_| DomainError::ValidationError(vec!["Invalid UUID format".to_string()]))?;
+            .map_err(|_| DomainError::ValidationError {
+                errors: vec!["Invalid UUID format".to_string()],
+            })?;
         let book_id = BookId::from_uuid(uuid);
         self.repository.find(&book_id).await
     }
@@ -60,7 +62,9 @@ impl BookUsecase for BookUsecaseImpl {
     }
     async fn update_book(&self, id: String, input: UpdateBookInput) -> DomainResult<()> {
         let uuid = Uuid::from_str(&id)
-            .map_err(|_| DomainError::ValidationError(vec!["Invalid UUID format".to_string()]))?;
+            .map_err(|_| DomainError::ValidationError {
+                errors: vec!["Invalid UUID format".to_string()],
+            })?;
         let book_id = BookId::from_uuid(uuid);
         let existing_book = self.repository.find(&book_id).await?;
         let new_name = BookName::new(input.name)?;
@@ -69,7 +73,9 @@ impl BookUsecase for BookUsecaseImpl {
     }
     async fn delete_book(&self, id: String) -> DomainResult<()> {
         let uuid = Uuid::from_str(&id)
-            .map_err(|_| DomainError::ValidationError(vec!["Invalid UUID format".to_string()]))?;
+            .map_err(|_| DomainError::ValidationError {
+                errors: vec!["Invalid UUID format".to_string()],
+            })?;
         let book_id = BookId::from_uuid(uuid);
         self.repository.delete(&book_id).await
     }

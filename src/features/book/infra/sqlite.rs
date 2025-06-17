@@ -7,6 +7,15 @@ use crate::features::book::model::{
     Book, BookId, BookName, BookRepository, DomainError, DomainResult,
 };
 
+// sqlx::Errorからの自動変換
+impl From<sqlx::Error> for DomainError {
+    fn from(err: sqlx::Error) -> Self {
+        DomainError::RepositoryError {
+            message: err.to_string(),
+        }
+    }
+}
+
 #[derive(FromRow, Debug)]
 struct BookRow {
     id: Option<String>,
@@ -19,9 +28,13 @@ impl BookRow {
         let id_str = self
             .id
             .as_ref()
-            .ok_or_else(|| DomainError::DatabaseError("Missing id".into()))?;
+            .ok_or_else(|| DomainError::RepositoryError {
+                message: "Missing id".to_string(),
+            })?;
         let uuid = Uuid::parse_str(id_str)
-            .map_err(|_| DomainError::DatabaseError("Invalid UUID format".into()))?;
+            .map_err(|_| DomainError::RepositoryError {
+                message: "Invalid UUID format".to_string(),
+            })?;
         Ok(BookId::from_uuid(uuid))
     }
 
@@ -29,13 +42,17 @@ impl BookRow {
         let name_str = self
             .name
             .as_ref()
-            .ok_or_else(|| DomainError::DatabaseError("Missing name".into()))?;
+            .ok_or_else(|| DomainError::RepositoryError {
+                message: "Missing name".to_string(),
+            })?;
         BookName::new(name_str.clone())
     }
     fn get_created_at(&self) -> DomainResult<NaiveDateTime> {
         let created_at = self
             .created_at
-            .ok_or_else(|| DomainError::DatabaseError("Missing name".into()))?;
+            .ok_or_else(|| DomainError::RepositoryError {
+                message: "Missing created_at".to_string(),
+            })?;
         Ok(created_at)
     }
 }
@@ -73,15 +90,9 @@ impl BookRepository for SqliteBookRepository {
         )
         .fetch_one(&self.pool)
         .await
-        .map_err(|err| DomainError::DatabaseError(format!("Failed to find book: {}", err)))?;
+        .map_err(DomainError::from)?;
 
-        match Book::try_from(row) {
-            Ok(row) => Ok(row),
-            Err(err) => Err(DomainError::DatabaseError(format!(
-                "Failed restore row: {}",
-                err
-            ))),
-        }
+        Book::try_from(row)
     }
 
     async fn list(&self) -> Vec<Book> {
@@ -119,7 +130,7 @@ impl BookRepository for SqliteBookRepository {
         )
         .execute(&self.pool)
         .await
-        .map_err(|err| DomainError::DatabaseError(format!("Failed to save book: {}", err)))?;
+        .map_err(DomainError::from)?;
 
         Ok(())
     }
@@ -131,7 +142,7 @@ impl BookRepository for SqliteBookRepository {
         sqlx::query!("UPDATE books SET name = $1 WHERE id = $2", name, id)
             .execute(&self.pool)
             .await
-            .map_err(|err| DomainError::DatabaseError(format!("Failed to update book: {}", err)))?;
+            .map_err(DomainError::from)?;
 
         Ok(())
     }
@@ -141,7 +152,7 @@ impl BookRepository for SqliteBookRepository {
         sqlx::query!("DELETE FROM books WHERE id = ?", id)
             .execute(&self.pool)
             .await
-            .map_err(|err| DomainError::DatabaseError(format!("Failed to delete book: {}", err)))?;
+            .map_err(DomainError::from)?;
 
         Ok(())
     }
