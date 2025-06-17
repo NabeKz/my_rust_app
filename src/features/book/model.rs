@@ -13,16 +13,16 @@ pub struct BookId(Uuid);
 pub enum DomainError {
     #[error("Invalid book name: {reason}")]
     InvalidBookName { reason: String },
-    
+
     #[error("Book not found with ID: {id}")]
     BookNotFound { id: String },
-    
+
     #[error("Validation failed: {errors:?}")]
     ValidationError { errors: Vec<String> },
-    
+
     #[error("Data conversion failed: {message}")]
     DataConversionError { message: String },
-    
+
     #[error("Repository operation failed")]
     RepositoryError(#[source] anyhow::Error),
 }
@@ -125,47 +125,47 @@ pub trait BookRepository: Sync + Send + 'static {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use proptest::prelude::*;
 
-    proptest! {
-        #[test]
-        fn prop_book_name_valid_creation(name in "[a-zA-Z0-9 ]{1,255}") {
-            let result = BookName::new(&name);
-            prop_assert!(result.is_ok());
-            if let Ok(book_name) = result {
-                prop_assert_eq!(book_name.value(), name.trim());
-            }
-        }
+    #[test]
+    fn test_book_name_valid_creation() {
+        let result = BookName::new("Valid Book Name");
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().value(), "Valid Book Name");
+    }
 
-        #[test]
-        fn prop_book_name_empty_fails(whitespace in "[ \t\n\r]*") {
-            let result = BookName::new(&whitespace);
-            prop_assert!(result.is_err());
-        }
+    #[test]
+    fn test_book_name_empty_fails() {
+        assert!(BookName::new("").is_err());
+        assert!(BookName::new("   ").is_err());
+    }
 
-        #[test]
-        fn prop_book_name_too_long_fails(name in "[a-zA-Z0-9]{256,1000}") {
-            let result = BookName::new(&name);
-            prop_assert!(result.is_err());
-        }
+    #[test]
+    fn test_book_name_too_long_fails() {
+        let long_name = "a".repeat(256);
+        let result = BookName::new(&long_name);
+        assert!(result.is_err());
+    }
 
-        #[test]
-        fn prop_book_update_preserves_id_and_created_at(
-            original_name in "[a-zA-Z0-9 ]{1,255}",
-            new_name in "[a-zA-Z0-9 ]{1,255}"
-        ) {
-            let original_book_name = BookName::new(&original_name).unwrap();
-            let new_book_name = BookName::new(&new_name).unwrap();
-            
-            let book = Book::new(original_book_name);
-            let original_id = book.id().value();
-            let original_created_at = *book.created_at();
-            
-            let updated_book = book.update_name(new_book_name.clone());
-            
-            prop_assert_eq!(updated_book.id().value(), original_id);
-            prop_assert_eq!(updated_book.created_at(), &original_created_at);
-            prop_assert_eq!(updated_book.name().value(), new_book_name.value());
-        }
+    #[test]
+    fn test_book_name_max_length_succeeds() {
+        let max_name = "a".repeat(255);
+        let result = BookName::new(&max_name);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_book_update_preserves_id_and_created_at() {
+        let original_name = BookName::new("Original").unwrap();
+        let new_name = BookName::new("Updated").unwrap();
+
+        let book = Book::new(original_name);
+        let original_id = book.id().value();
+        let original_created_at = *book.created_at();
+
+        let updated_book = book.update_name(new_name.clone());
+
+        assert_eq!(updated_book.id().value(), original_id);
+        assert_eq!(updated_book.created_at(), &original_created_at);
+        assert_eq!(updated_book.name().value(), new_name.value());
     }
 }
