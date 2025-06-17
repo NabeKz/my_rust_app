@@ -9,9 +9,12 @@ Content-Type: application/json
   "name": "hoge"
 }
 ###
-PUT {{baseUrl}}/api/books
+PUT {{baseUrl}}/api/books/
 Content-Type: application/json
 
 {
   "name": "hoge"
 }
+###
+DELETE {{baseUrl}}/api/books/733c1c89-bdf8-4cdd-ac55-18ffd7c73eb7
+Content-Type: application/json

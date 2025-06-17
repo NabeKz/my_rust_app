@@ -84,15 +84,15 @@ impl SqliteBookRepository {
 #[async_trait]
 impl BookRepository for SqliteBookRepository {
     async fn find(&self, id: &BookId) -> DomainResult<Book> {
-        let id_str = id.value().to_string();
+        let id = id.value().to_string();
         let row = sqlx::query_as!(
             BookRow,
-            "SELECT id, name, created_at FROM books WHERE id = ?",
-            id_str
+            "SELECT id, name, created_at FROM books WHERE id = $1",
+            id
         )
         .fetch_one(&self.pool)
         .await
-        .with_context(|| format!("Failed to find book with ID: {}", id_str))
+        .with_context(|| format!("Failed to find book with ID: {}", id))
         .map_err(DomainError::RepositoryError)?;
 
         Book::try_from(row)

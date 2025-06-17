@@ -53,6 +53,14 @@ pub fn api_route(cfg: &mut web::ServiceConfig) {
             .route(
                 "/books",
                 web::post().to(presentation::book::http::response::post),
+            )
+            .route(
+                "/books/{id}",
+                web::put().to(presentation::book::http::response::put),
+            )
+            .route(
+                "/books/{id}",
+                web::delete().to(presentation::book::http::response::delete),
             ),
     );
 }
