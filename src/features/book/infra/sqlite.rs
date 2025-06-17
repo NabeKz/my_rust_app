@@ -1,5 +1,5 @@
-use async_trait::async_trait;
 use anyhow::Context;
+use async_trait::async_trait;
 use chrono::NaiveDateTime;
 use sqlx::{FromRow, SqlitePool};
 use uuid::Uuid;
@@ -14,7 +14,7 @@ impl From<sqlx::Error> for DomainError {
         let detailed_error = anyhow::Error::from(err)
             .context("SQLite database operation failed")
             .context("Repository layer error occurred");
-        
+
         DomainError::RepositoryError(detailed_error)
     }
 }
@@ -34,10 +34,9 @@ impl BookRow {
             .ok_or_else(|| DomainError::DataConversionError {
                 message: "Missing id".to_string(),
             })?;
-        let uuid = Uuid::parse_str(id_str)
-            .map_err(|_| DomainError::DataConversionError {
-                message: "Invalid UUID format".to_string(),
-            })?;
+        let uuid = Uuid::parse_str(id_str).map_err(|_| DomainError::DataConversionError {
+            message: "Invalid UUID format".to_string(),
+        })?;
         Ok(BookId::from_uuid(uuid))
     }
 
@@ -94,7 +93,7 @@ impl BookRepository for SqliteBookRepository {
         .fetch_one(&self.pool)
         .await
         .with_context(|| format!("Failed to find book with ID: {}", id_str))
-        .map_err(|err| DomainError::RepositoryError(err))?;
+        .map_err(DomainError::RepositoryError)?;
 
         Book::try_from(row)
     }
@@ -135,7 +134,7 @@ impl BookRepository for SqliteBookRepository {
         .execute(&self.pool)
         .await
         .with_context(|| format!("Failed to save book with ID: {}", id))
-        .map_err(|err| DomainError::RepositoryError(err))?;
+        .map_err(DomainError::RepositoryError)?;
 
         Ok(())
     }
@@ -148,7 +147,7 @@ impl BookRepository for SqliteBookRepository {
             .execute(&self.pool)
             .await
             .with_context(|| format!("Failed to update book with ID: {}", id))
-            .map_err(|err| DomainError::RepositoryError(err))?;
+            .map_err(DomainError::RepositoryError)?;
 
         Ok(())
     }
@@ -159,7 +158,7 @@ impl BookRepository for SqliteBookRepository {
             .execute(&self.pool)
             .await
             .with_context(|| format!("Failed to delete book with ID: {}", id_str))
-            .map_err(|err| DomainError::RepositoryError(err))?;
+            .map_err(DomainError::RepositoryError)?;
 
         Ok(())
     }
