@@ -154,11 +154,15 @@ impl BookRepository for SqliteBookRepository {
 
     async fn delete(&self, id: &BookId) -> DomainResult<()> {
         let id_str = id.value().to_string();
-        sqlx::query!("DELETE FROM books WHERE id = ?", id_str)
+        let result = sqlx::query!("DELETE FROM books WHERE id = ?", id_str)
             .execute(&self.pool)
             .await
             .with_context(|| format!("Failed to delete book with ID: {}", id_str))
             .map_err(DomainError::RepositoryError)?;
+
+        if result.rows_affected() == 0 {
+            return Err(DomainError::BookNotFound { id: id_str });
+        }
 
         Ok(())
     }
