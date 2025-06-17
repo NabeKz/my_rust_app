@@ -54,7 +54,7 @@ pub async fn get(data: Data<Context>) -> HttpResponse {
     let result = data.book_usecase.get_books().await;
     let res = result
         .iter()
-        .map(|e| e.into())
+        .map(GetBookApiResponse::from)
         .collect::<Vec<GetBookApiResponse>>();
 
     HttpResponse::Ok().json(res)
