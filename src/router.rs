@@ -48,7 +48,7 @@ pub fn api_route(cfg: &mut web::ServiceConfig) {
         web::scope("api")
             .route(
                 "/books",
-                web::get().to(presentation::book::http::response::response),
+                web::get().to(presentation::book::http::response::get),
             )
             .route(
                 "/books",

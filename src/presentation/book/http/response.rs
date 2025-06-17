@@ -14,6 +14,7 @@ use crate::{
 
 #[derive(Serialize)]
 pub struct GetBookApiResponse {
+    pub id: String,
     pub name: String,
 }
 
@@ -29,7 +30,8 @@ pub struct UpdateBookApiRequest {
 impl From<&Book> for GetBookApiResponse {
     fn from(res: &Book) -> Self {
         GetBookApiResponse {
-            name: String::from(res.name().value()),
+            id: res.id().value().to_string(),
+            name: res.name().value().to_string(),
         }
     }
 }
