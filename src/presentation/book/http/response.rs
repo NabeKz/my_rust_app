@@ -6,8 +6,16 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     context::Context,
-    features::book::usecase::{CreateBookInput, UpdateBookInput},
+    features::book::{
+        model::Book,
+        usecase::{CreateBookInput, UpdateBookInput},
+    },
 };
+
+#[derive(Serialize)]
+pub struct GetBookApiResponse {
+    pub name: String,
+}
 
 #[derive(Deserialize)]
 pub struct CreateBookApiRequest {
@@ -16,6 +24,14 @@ pub struct CreateBookApiRequest {
 #[derive(Deserialize)]
 pub struct UpdateBookApiRequest {
     pub name: String,
+}
+
+impl From<&Book> for GetBookApiResponse {
+    fn from(res: &Book) -> Self {
+        GetBookApiResponse {
+            name: String::from(res.name().value()),
+        }
+    }
 }
 
 impl From<CreateBookApiRequest> for CreateBookInput {
@@ -34,10 +50,14 @@ pub struct JsonResponse {
     name: String,
 }
 
-pub async fn response() -> HttpResponse {
-    HttpResponse::Ok().json(JsonResponse {
-        name: String::from(""),
-    })
+pub async fn get(data: Data<Context>) -> HttpResponse {
+    let result = data.book_usecase.get_books().await;
+    let res = result
+        .iter()
+        .map(|e| e.into())
+        .collect::<Vec<GetBookApiResponse>>();
+
+    HttpResponse::Ok().json(res)
 }
 
 pub async fn post(data: Data<Context>, json: Json<CreateBookApiRequest>) -> HttpResponse {

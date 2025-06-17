@@ -11,5 +11,6 @@
 [ ] - validate on create and update
 [ ] - implements db adaptor
 [ ] - documentation
-[ ] - return json response
+[x] - return json response
 [x] - async trait
+[ ] - filter list response

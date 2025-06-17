@@ -8,3 +8,10 @@ Content-Type: application/json
 {
   "name": "hoge"
 }
+###
+PUT {{baseUrl}}/api/books
+Content-Type: application/json
+
+{
+  "name": "hoge"
+}
