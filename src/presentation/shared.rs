@@ -93,7 +93,7 @@ pub mod html {
     pub fn t_head(headers: Vec<&str>) -> String {
         headers
             .iter()
-            .map(|header| format!("<th>{}</td>", header))
+            .map(|header| format!("<th>{}</th>", header))
             .collect::<Vec<String>>()
             .join("")
     }
