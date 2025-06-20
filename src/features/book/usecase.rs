@@ -49,10 +49,11 @@ impl BookUsecase for BookUsecaseImpl {
         self.repository.find(&book_id).await
     }
     async fn create_book(&self, input: CreateBookInput) -> DomainResult<()> {
-        let book_name = BookName::new(input.name)?;
+        let book_name = BookName::new(input.name.clone())?;
 
         let book = Book::new(book_name);
-        let _ = self.repository.save(book).await;
+        self.repository.save(book).await?;
+        println!("BookCreated: {}", input.name.clone()); // 監査ログ
         Ok(())
     }
     async fn update_book(&self, id: String, input: UpdateBookInput) -> DomainResult<()> {
