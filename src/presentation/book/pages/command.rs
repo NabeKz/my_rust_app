@@ -37,7 +37,7 @@ pub async fn create(data: Data<Context>, form: Form<CreateBookRequest>) -> HttpR
 
     match result {
         Result::Ok(_) => redirect("/books"),
-        Result::Err(err) => redirect_with_error("/books", err),
+        Result::Err(err) => redirect_with_error("/books", err.to_string()),
     }
 }
 
