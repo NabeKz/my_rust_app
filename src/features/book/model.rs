@@ -27,24 +27,6 @@ pub enum DomainError {
     RepositoryError(#[source] anyhow::Error),
 }
 
-#[derive(Debug, Clone)]
-pub enum DomainEvent {
-    BookCreated {
-        book_id: BookId,
-        name: String,
-        created_at: NaiveDateTime,
-    },
-    BookUpdated {
-        book_id: BookId,
-        old_name: String,
-        new_name: String,
-    },
-    BookDeleted {
-        book_id: BookId,
-        name: String,
-    },
-}
-
 pub type DomainResult<T> = Result<T, DomainError>;
 
 impl BookName {
