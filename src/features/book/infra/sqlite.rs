@@ -5,7 +5,7 @@ use sqlx::{FromRow, SqlitePool};
 use uuid::Uuid;
 
 use crate::features::book::model::{
-    Book, BookId, BookName, BookRepository, DomainError, DomainResult,
+    Book, BookId, BookName, BookRepository, BookSearchParams, DomainError, DomainResult,
 };
 
 // sqlx::Errorからの詳細コンテキスト付き変換
@@ -98,7 +98,7 @@ impl BookRepository for SqliteBookRepository {
         Book::try_from(row)
     }
 
-    async fn list(&self) -> Vec<Book> {
+    async fn list(&self, _params: BookSearchParams) -> Vec<Book> {
         let rows = match sqlx::query_as!(
             BookRow,
             "SELECT id, name, created_at FROM books ORDER BY created_at DESC"

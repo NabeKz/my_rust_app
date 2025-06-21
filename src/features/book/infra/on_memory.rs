@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use std::sync::{Arc, Mutex};
 
 use crate::features::book::model::{
-    Book, BookId, BookName, BookRepository, DomainError, DomainResult,
+    Book, BookId, BookName, BookRepository, BookSearchParams, DomainError, DomainResult,
 };
 
 pub struct BookRepositoryOnMemory {
@@ -23,7 +23,7 @@ impl Default for BookRepositoryOnMemory {
 
 #[async_trait]
 impl BookRepository for BookRepositoryOnMemory {
-    async fn list(&self) -> Vec<Book> {
+    async fn list(&self, _params: BookSearchParams) -> Vec<Book> {
         self.items.lock().unwrap().clone()
     }
 

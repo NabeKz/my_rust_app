@@ -5,8 +5,12 @@ use std::result::Result::Ok;
 use uuid::Uuid;
 
 use crate::features::book::model::{
-    Book, BookId, BookName, BookRepository, DomainError, DomainResult,
+    Book, BookId, BookName, BookRepository, BookSearchParams, DomainError, DomainResult,
 };
+
+pub struct GetBooksInput {
+    pub name: Option<String>,
+}
 
 pub struct CreateBookInput {
     pub name: String,
@@ -19,7 +23,7 @@ pub struct UpdateBookInput {
 #[async_trait]
 pub trait BookUsecase: Sync + Send + 'static {
     async fn get_book(&self, id: String) -> DomainResult<Book>;
-    async fn get_books(&self) -> Vec<Book>;
+    async fn get_books(&self, params: GetBooksInput) -> Vec<Book>;
     async fn create_book(&self, input: CreateBookInput) -> DomainResult<()>;
     async fn update_book(&self, id: String, input: UpdateBookInput) -> DomainResult<()>;
     async fn delete_book(&self, id: String) -> DomainResult<()>;
@@ -30,6 +34,12 @@ pub struct BookUsecaseImpl {
     repository: Arc<dyn BookRepository>,
 }
 
+impl From<GetBooksInput> for BookSearchParams {
+    fn from(_value: GetBooksInput) -> Self {
+        todo!()
+    }
+}
+
 impl BookUsecaseImpl {
     pub fn new(repository: Arc<dyn BookRepository>) -> Self {
         Self { repository }
@@ -38,8 +48,8 @@ impl BookUsecaseImpl {
 
 #[async_trait]
 impl BookUsecase for BookUsecaseImpl {
-    async fn get_books(&self) -> Vec<Book> {
-        self.repository.list().await
+    async fn get_books(&self, params: GetBooksInput) -> Vec<Book> {
+        self.repository.list(params.into()).await
     }
     async fn get_book(&self, id: String) -> DomainResult<Book> {
         let uuid = Uuid::from_str(&id).map_err(|_| DomainError::ValidationError {

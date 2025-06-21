@@ -8,7 +8,7 @@ use crate::{
     context::Context,
     features::book::{
         model::Book,
-        usecase::{CreateBookInput, UpdateBookInput},
+        usecase::{CreateBookInput, GetBooksInput, UpdateBookInput},
     },
 };
 
@@ -19,12 +19,22 @@ pub struct GetBookApiResponse {
 }
 
 #[derive(Deserialize)]
+pub struct GetBooksApiRequest {
+    pub name: Option<String>,
+}
+#[derive(Deserialize)]
 pub struct CreateBookApiRequest {
     pub name: String,
 }
 #[derive(Deserialize)]
 pub struct UpdateBookApiRequest {
     pub name: String,
+}
+
+impl From<GetBooksApiRequest> for GetBooksInput {
+    fn from(res: GetBooksApiRequest) -> Self {
+        GetBooksInput { name: res.name }
+    }
 }
 
 impl From<&Book> for GetBookApiResponse {
@@ -52,8 +62,9 @@ pub struct JsonResponse {
     name: String,
 }
 
-pub async fn get(data: Data<Context>) -> HttpResponse {
-    let result = data.book_usecase.get_books().await;
+pub async fn get(data: Data<Context>, json: Json<GetBooksApiRequest>) -> HttpResponse {
+    let input = json.into_inner().into();
+    let result = data.book_usecase.get_books(input).await;
     let res = result
         .iter()
         .map(GetBookApiResponse::from)

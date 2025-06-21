@@ -113,10 +113,14 @@ impl Book {
     }
 }
 
+pub struct BookSearchParams {
+    pub name: String,
+}
+
 #[async_trait]
 pub trait BookRepository: Sync + Send + 'static {
     async fn find(&self, id: &BookId) -> DomainResult<Book>;
-    async fn list(&self) -> Vec<Book>;
+    async fn list(&self, params: BookSearchParams) -> Vec<Book>;
     async fn save(&self, book: Book) -> DomainResult<()>;
     async fn update(&self, book: Book) -> DomainResult<()>;
     async fn delete(&self, id: &BookId) -> DomainResult<()>;

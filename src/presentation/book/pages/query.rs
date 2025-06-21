@@ -1,10 +1,23 @@
 use actix_web::HttpRequest;
-use actix_web::web::Path;
+use actix_web::web::{Path, Query};
 use actix_web::{HttpResponse, web::Data};
+use serde::Deserialize;
 
 use crate::context::Context;
 use crate::features::book::model::Book;
+use crate::features::book::usecase::GetBooksInput;
 use crate::presentation::shared::html::{self, HtmlResponse, input, post_form, put_form};
+
+#[derive(Deserialize)]
+pub struct GetBookQuery {
+    name: Option<String>,
+}
+
+impl From<GetBookQuery> for GetBooksInput {
+    fn from(value: GetBookQuery) -> Self {
+        GetBooksInput { name: value.name }
+    }
+}
 
 fn td(book: &Book) -> String {
     format!(
@@ -21,8 +34,9 @@ fn td(book: &Book) -> String {
     )
 }
 
-pub async fn list(data: Data<Context>) -> HttpResponse {
-    let books = data.book_usecase.get_books().await;
+pub async fn list(data: Data<Context>, query: Query<GetBookQuery>) -> HttpResponse {
+    let query = query.into_inner().into();
+    let books = data.book_usecase.get_books(query).await;
     let table = html::table(vec!["id", "name", "edit", "delete"], books, td);
     let body = r"
     <div style=display:flex;gap:16px;>
