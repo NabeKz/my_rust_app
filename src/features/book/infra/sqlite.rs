@@ -98,10 +98,11 @@ impl BookRepository for SqliteBookRepository {
         Book::try_from(row)
     }
 
-    async fn list(&self, _params: BookSearchParams) -> Vec<Book> {
+    async fn list(&self, params: BookSearchParams) -> Vec<Book> {
         let rows = match sqlx::query_as!(
             BookRow,
-            "SELECT id, name, created_at FROM books ORDER BY created_at DESC"
+            "SELECT id, name, created_at FROM books WHERE name LIKE ? ORDER BY created_at DESC",
+            params.name
         )
         .fetch_all(&self.pool)
         .await
