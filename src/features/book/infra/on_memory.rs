@@ -23,8 +23,33 @@ impl Default for BookRepositoryOnMemory {
 
 #[async_trait]
 impl BookRepository for BookRepositoryOnMemory {
-    async fn list(&self, _params: BookSearchParams) -> Vec<Book> {
-        self.items.lock().unwrap().clone()
+    async fn list(&self, params: BookSearchParams) -> Vec<Book> {
+        let items = self.items.lock().unwrap();
+        
+        items
+            .iter()
+            .filter(|book| {
+                // Name filter
+                let name_match = if params.name.is_empty() {
+                    true
+                } else {
+                    book.name().value().contains(&params.name)
+                };
+
+                // Created at from filter
+                let from_match = params.created_at_from
+                    .map(|from| book.created_at() >= &from)
+                    .unwrap_or(true);
+
+                // Created at to filter
+                let to_match = params.created_at_to
+                    .map(|to| book.created_at() <= &to)
+                    .unwrap_or(true);
+
+                name_match && from_match && to_match
+            })
+            .cloned()
+            .collect()
     }
 
     async fn save(&self, item: Book) -> DomainResult<()> {

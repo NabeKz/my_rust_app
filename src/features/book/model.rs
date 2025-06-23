@@ -115,6 +115,8 @@ impl Book {
 
 pub struct BookSearchParams {
     pub name: String,
+    pub created_at_from: Option<NaiveDateTime>,
+    pub created_at_to: Option<NaiveDateTime>,
 }
 
 #[async_trait]
