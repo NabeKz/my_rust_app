@@ -1,7 +1,7 @@
 use anyhow::Context;
 use async_trait::async_trait;
 use chrono::NaiveDateTime;
-use sqlx::{Arguments, FromRow, SqlitePool};
+use sqlx::{FromRow, Sqlite, SqlitePool};
 use uuid::Uuid;
 
 use crate::features::book::model::{
@@ -92,37 +92,29 @@ impl BookFilter {
         }
     }
 
-    fn to_sql(&self) -> (String, sqlx::sqlite::SqliteArguments<'_>) {
-        let mut conditions = Vec::new();
-        let mut args = sqlx::sqlite::SqliteArguments::default();
-
-        if let Some(ref name) = self.name {
-            conditions.push("name LIKE ?");
-            let _ = args.add(name);
+    fn apply_to_query_builder(self, mut builder: sqlx::QueryBuilder<Sqlite>) -> sqlx::QueryBuilder<Sqlite> {
+        let mut conditions: Vec<String> = Vec::new();
+        
+        self.name.map(|name| {
+            builder.push_bind(name);
+            conditions.push("name LIKE ?".to_string());
+        });
+        
+        self.created_at_from.map(|from_date| {
+            builder.push_bind(from_date);
+            conditions.push("created_at >= ?".to_string());
+        });
+        
+        self.created_at_to.map(|to_date| {
+            builder.push_bind(to_date);
+            conditions.push("created_at <= ?".to_string());
+        });
+        
+        if !conditions.is_empty() {
+            builder.push(" WHERE ").push(&conditions.join(" AND "));
         }
-
-        if let Some(ref from_date) = self.created_at_from {
-            conditions.push("created_at >= ?");
-            let _ = args.add(from_date);
-        }
-
-        if let Some(ref to_date) = self.created_at_to {
-            conditions.push("created_at <= ?");
-            let _ = args.add(to_date);
-        }
-
-        let where_clause = if conditions.is_empty() {
-            String::new()
-        } else {
-            format!(" WHERE {}", conditions.join(" AND "))
-        };
-
-        let sql = format!(
-            "SELECT id, name, created_at FROM books{} ORDER BY created_at DESC",
-            where_clause
-        );
-
-        (sql, args)
+        
+        builder
     }
 }
 
@@ -155,9 +147,12 @@ impl BookRepository for SqliteBookRepository {
 
     async fn list(&self, params: BookSearchParams) -> Vec<Book> {
         let filter = BookFilter::from_search_params(params);
-        let (sql, args) = filter.to_sql();
+        let base_query = sqlx::QueryBuilder::new("SELECT id, name, created_at FROM books");
+        let mut query = filter.apply_to_query_builder(base_query);
+        query.push(" ORDER BY created_at DESC");
 
-        let rows = match sqlx::query_as_with::<_, BookRow, _>(&sql, args)
+        let rows = match query
+            .build_query_as::<BookRow>()
             .fetch_all(&self.pool)
             .await
         {
